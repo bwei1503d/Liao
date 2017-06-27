@@ -45,6 +45,8 @@ public class UserAction extends ActionSupport {
 	@Autowired
 	private UserService userService;
 	
+	public static final String IMAGE_HEADER = "http://qhb.2dyt.com" ;
+	
 	// 参数不对
 	public static int PARAMS_ERRPR = 300 ;
 	//用户未登录
@@ -134,6 +136,11 @@ public class UserAction extends ActionSupport {
 					userService.register(user);
 					ActionContext.getContext().getSession()
 							.put("registerUser", user);
+					
+					ServletActionContext.getContext().getSession()
+					.put("loginUser", user);
+					
+					
 					jo.put("result_code", 200);
 					jo.put("result_message", "success");
 					jo1.put("userId", user.getUserId());
@@ -326,8 +333,11 @@ public class UserAction extends ActionSupport {
 			User oulduser = (User) session.get("loginUser");
 			// 删掉原图片
 			String ouldpath = oulduser.getImagePath();
-			File f = new File(ouldpath);
-			f.delete();
+			if(!StringUtils.isEmpty(ouldpath)){
+				File f = new File(ouldpath);
+				f.delete();
+			}
+			
 			String realPath = ServletActionContext.getServletContext()
 					.getRealPath("/images");
 			System.out.println(realPath);
@@ -351,10 +361,14 @@ public class UserAction extends ActionSupport {
 				is.close();
 				os.close();
 			}
-			oulduser.setImagePath(realPath + newFileName);
+			String filename = IMAGE_HEADER + File.separator + "MyInterface" + File.separator + "images" + File.separator + newFileName; 
+			oulduser.setImagePath(filename);
+//			oulduser.setImagePath(realPath + newFileName);
 			userService.uploadHeadPortrait(oulduser);
 			jo.put("result_code", 200);
-			jo.put("headImagePath", realPath + "\\" + newFileName);
+			
+			jo.put("headImagePath", filename);
+//			jo.put("headImagePath", IMAGE_HEADER + realPath + File.separator + newFileName);
 			jo.put("result_message", "修改成功");
 		} else {
 			jo.put("result_code", 400);
