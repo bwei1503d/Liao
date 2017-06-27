@@ -26,5 +26,20 @@ public class StringUtils {
 		return val;
 	}
 		
+	
+	public static boolean isEmpty(String result){
+		
+		if(result == null){
+			return true;
+		}
+		
+		if("".equals(result)){
+			return true ;
+		}
+		
+		
+		return false ;
+		
+	}
 
 }
