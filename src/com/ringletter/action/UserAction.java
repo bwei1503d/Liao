@@ -40,8 +40,7 @@ import com.ringletter.utils.StringUtils;
 @Controller
 @Scope("prototype")
 public class UserAction extends ActionSupport {
-	
-	
+
 	private static final long serialVersionUID = 1L;
 	private User user;
 	private Album album;
@@ -49,22 +48,40 @@ public class UserAction extends ActionSupport {
 	private Relationship relationship;
 	@Autowired
 	private UserService userService;
-	
-	
+
+	/**
+	 * 参数不对
+	 * */
+	public static int PRARMS_ERROR = 300;
+
+	/**
+	 * 用户未登录
+	 * */
+	public static int UNLOGIN_ERROR = 301;
+
+	/**
+	 * 服务端异常
+	 * */
+	public static int SERVER_ERROR = 302;
+	/**
+	 * 成功
+	 * */
+	public static int SUCCESS = 200;
+
 	/**
 	 * 参数不全
 	 */
-	public void paramsError(JSONObject jsonObject){
+	public void paramsError(JSONObject jsonObject) {
 		try {
-			jsonObject.put("result_code", 400);
-			jsonObject.put("result_message", "手机号已存在");
+			jsonObject.put("result_code", PRARMS_ERROR);
+			jsonObject.put("result_message", "参数不正确");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	//登录
+	// 登录
 	public void login() throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
@@ -79,11 +96,11 @@ public class UserAction extends ActionSupport {
 			if (loginUser != null) {
 				ServletActionContext.getContext().getSession()
 						.put("loginUser", loginUser);
-				
-				jsonObject.put("result_code", 200);
+
+				jsonObject.put("result_code", SUCCESS);
 				jsonObject.put("result_message", "success");
 				long laftTime = System.currentTimeMillis();
-				
+
 				long createTime = loginUser.getCreatetime();
 				jsonObject2.put("userId", loginUser.getUserId());
 				jsonObject2.put("nickname", loginUser.getNickname());
@@ -97,8 +114,9 @@ public class UserAction extends ActionSupport {
 				jsonObject2.put("createtime", createTime);
 				jsonObject.put("data", jsonObject2);
 			} else {
-				jsonObject.put("result_code", 400);
-				jsonObject.put("result_message", URLDecoder.decode("用户名或密码错误","utf-8"));
+				jsonObject.put("result_code", PRARMS_ERROR);
+				jsonObject.put("result_message",
+						URLDecoder.decode("用户名或密码错误", "utf-8"));
 			}
 			writer.println(jsonObject.toString());
 		} catch (JSONException e) {
@@ -117,7 +135,7 @@ public class UserAction extends ActionSupport {
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-		
+
 		JSONObject jo = new JSONObject();
 		JSONObject jo1 = new JSONObject();
 		try {
@@ -128,11 +146,11 @@ public class UserAction extends ActionSupport {
 					user.setCreatetime(d);
 					user.setLasttime(d);
 					user.setYxpassword(StringUtils.getStringRandom(8));
-					
+
 					userService.register(user);
 					ActionContext.getContext().getSession()
 							.put("registerUser", user);
-					jo.put("result_code", 200);
+					jo.put("result_code", SUCCESS);
 					jo.put("result_message", "success");
 					jo1.put("userId", user.getUserId());
 					jo1.put("area", user.getArea());
@@ -145,11 +163,11 @@ public class UserAction extends ActionSupport {
 					jo1.put("yxpassword", user.getYxpassword());
 					jo.put("data", jo1);
 				} else {
-					jo.put("result_code", 400);
+					jo.put("result_code", PRARMS_ERROR);
 					jo.put("result_message", "手机号已存在");
 				}
 			} else {
-				jo.put("result_code", 400);
+				jo.put("result_code", PRARMS_ERROR);
 				jo.put("result_message", "注册失败");
 			}
 			out.println(jo.toString());
@@ -172,6 +190,7 @@ public class UserAction extends ActionSupport {
 		JSONObject jo = new JSONObject();
 		User registerUser = (User) ServletActionContext.getContext()
 				.getSession().get("registerUser");
+
 		if (user.getFile() != null && user.getFile().isFile()) {
 			String realPath = ServletActionContext.getServletContext()
 					.getRealPath("/images");
@@ -197,11 +216,11 @@ public class UserAction extends ActionSupport {
 			}
 			registerUser.setImagePath(realPath + "\\" + newFileName);
 			userService.uploadHeadPortrait(registerUser);
-			jo.put("result_code", 200);
+			jo.put("result_code", SUCCESS);
 			jo.put("headImagePath", realPath + "\\" + newFileName);
 			jo.put("result_message", "上传成功");
 		} else {
-			jo.put("result_code", 500);
+			jo.put("result_code", UNLOGIN_ERROR);
 			jo.put("result_message", "您还没有登录");
 		}
 		out.println(jo.toString());
@@ -217,7 +236,7 @@ public class UserAction extends ActionSupport {
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter writer = response.getWriter();
-		
+
 		JSONObject jsonObject = new JSONObject();
 		JSONObject jsonObject2 = new JSONObject();
 		User loginUser = (User) ServletActionContext.getContext().getSession()
@@ -226,9 +245,9 @@ public class UserAction extends ActionSupport {
 			String newPassword = request.getParameter("newPassword");
 			User user2 = userService.updatePassword(newPassword);
 			if (user2 != null) {
-				jsonObject.put("result_code", 200);
+				jsonObject.put("result_code", SUCCESS);
 				jsonObject.put("result_message", "success");
-				
+
 				long laftTime = System.currentTimeMillis();
 				long createTime = user2.getCreatetime();
 				jsonObject2.put("userId", user2.getUserId());
@@ -242,19 +261,19 @@ public class UserAction extends ActionSupport {
 				jsonObject2.put("lasttime", laftTime);
 				jsonObject2.put("createtime", createTime);
 				jsonObject.put("data", jsonObject2);
-				
+
 				writer.println(jsonObject.toString());
 				writer.flush();
 				ServletActionContext.getContext().getSession().clear();
 			} else {
-				jsonObject.put("result_code", 400);
+				jsonObject.put("result_code", PRARMS_ERROR);
 				jsonObject.put("result_message", "新密码与旧密码相同!");
 				writer.println(jsonObject.toString());
 				writer.flush();
 			}
 		} else {
-			jsonObject.put("result_code", 500);
-			jsonObject.put("result_message", "您还没有登录");
+			jsonObject.put("result_code", UNLOGIN_ERROR);
+			jsonObject.put("result_message", "用户未登录");
 			writer.println(jsonObject.toString());
 			writer.flush();
 		}
@@ -279,12 +298,12 @@ public class UserAction extends ActionSupport {
 				if (user2 != null) {
 					ServletActionContext.getContext().getSession()
 							.put("loginUser", user2);
-					
-					jsonObject.put("result_code", 200);
+
+					jsonObject.put("result_code", SUCCESS);
 					jsonObject.put("result_message", "success");
 					long laftTime = System.currentTimeMillis();
 					long createTime = user2.getCreatetime();
-					
+
 					jsonObject2.put("userId", user2.getUserId());
 					jsonObject2.put("nickname", user2.getNickname());
 					jsonObject2.put("password", user2.getPassword());
@@ -300,8 +319,8 @@ public class UserAction extends ActionSupport {
 					writer.flush();
 				}
 			} else {
-				jsonObject.put("result_code", 400);
-				jsonObject.put("result_message", "修改失败");
+				jsonObject.put("result_code", UNLOGIN_ERROR);
+				jsonObject.put("result_message", "用户未登录");
 				writer.println(jsonObject.toString());
 				writer.flush();
 			}
@@ -351,12 +370,12 @@ public class UserAction extends ActionSupport {
 			}
 			oulduser.setImagePath(realPath + newFileName);
 			userService.uploadHeadPortrait(oulduser);
-			jo.put("result_code", 200);
+			jo.put("result_code", SUCCESS);
 			jo.put("headImagePath", realPath + "\\" + newFileName);
 			jo.put("result_message", "修改成功");
 		} else {
-			jo.put("result_code", 400);
-			jo.put("result_message", "修改失败");
+			jo.put("result_code", UNLOGIN_ERROR);
+			jo.put("result_message", "用户未登录");
 		}
 		out.println(jo.toString());
 		out.flush();
@@ -401,12 +420,12 @@ public class UserAction extends ActionSupport {
 			album.setUserId(loginUser.getUserId());
 			album.setImagePath(realPath + "\\" + newFileName);
 			userService.uploadImageToAlbum(album);
-			jsonObject.put("result_code", 200);
+			jsonObject.put("result_code", SUCCESS);
 			jsonObject.put("headImagePath", realPath + "\\" + newFileName);
 			jsonObject.put("result_message", "上传成功");
 		} else {
-			jsonObject.put("result_code", 400);
-			jsonObject.put("result_message", "上传失败");
+			jsonObject.put("result_code", UNLOGIN_ERROR);
+			jsonObject.put("result_message", "用户未登录");
 		}
 		writer.println(jsonObject);
 	}
@@ -436,9 +455,6 @@ public class UserAction extends ActionSupport {
 			jo.put("data", ja);
 			jo.put("pageCount", "共" + pageSum + "条记录");
 			jo.put("result_code", 200);
-		} else {
-			jo.put("result_code", 400);
-			jo.put("result_message", "查询失败");
 		}
 		writer.println(jo.toString());
 	}
@@ -457,7 +473,7 @@ public class UserAction extends ActionSupport {
 		writer.println(json);
 	}
 
-	//添加好友
+	// 添加好友
 	public void addFriends() {
 		try {
 			HttpServletResponse response = ServletActionContext.getResponse();
@@ -471,29 +487,28 @@ public class UserAction extends ActionSupport {
 					.getSession().get("loginUser");
 			if (loginUser != null && relationship != null
 					&& relationship.getFriendId() != null
-					&& relationship.getGroupName()!= null
+					&& relationship.getGroupName() != null
 					&& relationship.getFriendId() != 0) {
-				
+
 				relationship.setUserId(loginUser.getUserId());
-				
+
 				boolean checkAddUser = userService.checkAddUser(relationship);
 				if (checkAddUser == false) {
 					userService.addUserrelationship(relationship);
-					jsonObject.put("result_code", 200);
+					jsonObject.put("result_code", SUCCESS);
 					jsonObject.put("result_message", "添加好友成功!");
 					writer.println(jsonObject.toString());
 					writer.flush();
 				} else {
-					jsonObject.put("result_code", 400);
+					jsonObject.put("result_code", PRARMS_ERROR);
 					jsonObject.put("result_message", "添加好友失败！");
 					writer.println(jsonObject.toString());
 					writer.flush();
 				}
-				
-				
+
 			} else {
-				jsonObject.put("result_code", 400);
-				jsonObject.put("result_message", "添加好友失败！");
+				jsonObject.put("result_code", UNLOGIN_ERROR);
+				jsonObject.put("result_message", "用户未登录");
 				writer.println(jsonObject.toString());
 				writer.flush();
 			}
@@ -512,20 +527,19 @@ public class UserAction extends ActionSupport {
 			response.setCharacterEncoding("UTF-8");
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter writer = response.getWriter();
-			
-			
-			long thisTime = System.currentTimeMillis();			
+
+			long thisTime = System.currentTimeMillis();
 			chat.setMessageTime(thisTime);
 			String insertChat = userService.insertChat(chat);
 			JSONObject jsonObject = new JSONObject();
 			if (insertChat.contains("success")) {
-				jsonObject.put("result_code", 200);
+				jsonObject.put("result_code", SUCCESS);
 				jsonObject.put("result_message", "success");
 				writer.println(jsonObject.toString());
 				writer.flush();
 			} else {
-				jsonObject.put("result_code", 400);
-				jsonObject.put("result_message", "error");
+				jsonObject.put("result_code", PRARMS_ERROR);
+				jsonObject.put("result_message", "聊天失败");
 				writer.println(jsonObject.toString());
 				writer.flush();
 			}
@@ -558,15 +572,15 @@ public class UserAction extends ActionSupport {
 							Integer.parseInt(pageIndex),
 							Integer.parseInt(pageSize));
 			String json = gson.toJson(selectAllUserAndFriend);
-			jsonObject.put("result_code", 200);
+			jsonObject.put("result_code", SUCCESS);
 			jsonObject.put("result_message", "success");
 			JSONArray jsonArray = new JSONArray(json);
 			jsonObject.put("date", jsonArray);
 			writer.println(jsonObject.toString());
 			writer.flush();
 		} else {
-			jsonObject.put("result_code", 400);
-			jsonObject.put("result_message", "error");
+			jsonObject.put("result_code", UNLOGIN_ERROR);
+			jsonObject.put("result_message", "用户未登录!");
 			writer.println(jsonObject.toString());
 			writer.flush();
 		}
@@ -579,6 +593,10 @@ public class UserAction extends ActionSupport {
 		request.setCharacterEncoding("utf-8");
 		String pageIndex_ = request.getParameter("pageIndex");
 		int pageIndex = 0;
+
+		User loginUser = (User) ServletActionContext.getContext().getSession()
+				.get("loginUser");
+
 		if (!"".equals(pageIndex_)) {
 			pageIndex = Integer.parseInt(pageIndex_);
 		}
@@ -600,17 +618,17 @@ public class UserAction extends ActionSupport {
 		JSONArray ja = new JSONArray(chatjson);
 		if (selectChatList != null && selectChatList.size() > 0) {
 			jsonObject.put("data", ja);
-			jsonObject.put("result_code", 200);
+			jsonObject.put("result_code", SUCCESS);
 			jsonObject.put("result_message", "success");
 			writer.println(jsonObject.toString());
 		} else {
-			jsonObject.put("result_code", 400);
+			jsonObject.put("result_code", SUCCESS);
 			jsonObject.put("result_message", "没有聊天记录");
 			jsonObject.put("data", ja);
 			writer.println(jsonObject.toString());
 		}
 	}
-	
+
 	// 查询用户的相册信息
 	// 必须登录
 	public void selectUserAlbum() {
@@ -631,29 +649,29 @@ public class UserAction extends ActionSupport {
 					Gson g = new Gson();
 					String albumJson = g.toJson(selectUserAlbum);
 					JSONArray jsonArray = new JSONArray(albumJson);
-					jsonObject.put("result_code", 200);
+					jsonObject.put("result_code", SUCCESS);
 					jsonObject.put("data", jsonArray);
 					jsonObject.put("result_message", "success");
 					writer.println(jsonObject.toString());
 				} else {
-					jsonObject.put("result_code", 400);
+					jsonObject.put("result_code", PRARMS_ERROR);
 					jsonObject.put("result_message", "相册为空");
 					writer.println(jsonObject.toString());
 				}
 			} else {
-				jsonObject.put("result_code", 500);
-				jsonObject.put("result_message", "请先登录");
+				jsonObject.put("result_code", UNLOGIN_ERROR);
+				jsonObject.put("result_message", "用户未登录");
 				writer.println(jsonObject.toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void selectAlbum() throws Exception{
-	
-		
+
+	public void selectAlbum() throws Exception {
+
 	}
+
 	public User getUser() {
 		return user;
 	}
