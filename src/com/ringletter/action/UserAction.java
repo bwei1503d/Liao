@@ -48,6 +48,7 @@ public class UserAction extends ActionSupport {
 	private Relationship relationship;
 	@Autowired
 	private UserService userService;
+	
 
 	//登录
 	public void login() throws Exception {
