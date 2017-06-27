@@ -204,10 +204,15 @@ public class UserAction extends ActionSupport {
 				is.close();
 				os.close();
 			}
-			registerUser.setImagePath(realPath + "\\" + newFileName);
+			String filename = IMAGE_HEADER + File.separator + "MyInterface" + File.separator + "images" + File.separator + newFileName; 
+
+			registerUser.setImagePath(filename);
 			userService.uploadHeadPortrait(registerUser);
+//			registerUser.setImagePath(realPath + "\\" + newFileName);
+//			userService.uploadHeadPortrait(registerUser);
 			jo.put("result_code", 200);
-			jo.put("headImagePath", realPath + "\\" + newFileName);
+			jo.put("headImagePath", filename);
+//			jo.put("headImagePath", realPath + "\\" + newFileName);
 			jo.put("result_message", "上传成功");
 		} else {
 			jo.put("result_code", 500);
@@ -413,12 +418,17 @@ public class UserAction extends ActionSupport {
 				is.close();
 				os.close();
 			}
+			String filename = IMAGE_HEADER + File.separator + "MyInterface" + File.separator + "images" + File.separator + newFileName; 
+
 			// 为相册赋值
 			album.setUserId(loginUser.getUserId());
-			album.setImagePath(realPath + "\\" + newFileName);
+//			album.setImagePath(realPath + "\\" + newFileName);
+			album.setImagePath(filename);
+
 			userService.uploadImageToAlbum(album);
 			jsonObject.put("result_code", 200);
-			jsonObject.put("headImagePath", realPath + "\\" + newFileName);
+			jsonObject.put("headImagePath", filename);
+//			jsonObject.put("headImagePath", realPath + "\\" + newFileName);
 			jsonObject.put("result_message", "上传成功");
 		} else {
 			jsonObject.put("result_code", 400);
@@ -469,6 +479,8 @@ public class UserAction extends ActionSupport {
 		PrintWriter writer = response.getWriter();
 		User u = userService.selectUserById(user);
 		Gson g = new Gson();
+		u.setPassword("");
+		u.setYxpassword("");
 		String json = g.toJson(u);
 		writer.println(json);
 	}
