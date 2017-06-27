@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import com.ringletter.bean.Album;
@@ -49,6 +50,19 @@ public class UserAction extends ActionSupport {
 	@Autowired
 	private UserService userService;
 	
+	
+	/**
+	 * 参数不全
+	 */
+	public void paramsError(JSONObject jsonObject){
+		try {
+			jsonObject.put("result_code", 400);
+			jsonObject.put("result_message", "手机号已存在");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	//登录
 	public void login() throws Exception {
