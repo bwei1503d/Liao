@@ -5,6 +5,8 @@ package com.ringletter.bean;
 public class Album implements java.io.Serializable {
 
 	// Fields
+	
+	
 
 	private Integer albumId;
 	private Integer userId;
