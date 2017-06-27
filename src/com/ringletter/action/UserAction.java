@@ -54,6 +54,8 @@ public class UserAction extends ActionSupport {
 	//服务端异常
 	public static int SERVER_ERRPR = 302 ;
 
+	
+	
 
 	
 	/**
