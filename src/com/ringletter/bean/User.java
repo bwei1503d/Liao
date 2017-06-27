@@ -1,6 +1,7 @@
 package com.ringletter.bean;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * User entity. @author MyEclipse Persistence Tools
@@ -33,6 +34,9 @@ public class User implements java.io.Serializable {
 	private File file;
 	private String fileFileName;
 	private String fileContentType;
+	
+	//保存用户相册
+	private List<Album> listAlbum ;
 
 	// Constructors
 
@@ -175,6 +179,18 @@ public class User implements java.io.Serializable {
 
 	public void setLng(double lng) {
 		this.lng = lng;
+	}
+	
+	
+	
+	
+
+	public List<Album> getListAlbum() {
+		return listAlbum;
+	}
+
+	public void setListAlbum(List<Album> listAlbum) {
+		this.listAlbum = listAlbum;
 	}
 
 	public User(Integer userId, String nickname, String password,

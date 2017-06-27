@@ -95,7 +95,6 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject = new JSONObject();
 		JSONObject jsonObject2 = new JSONObject();
 		try {
-			// user.setLasttime(new Date());
 			User loginUser = userService.login(user);
 			if (loginUser != null) {
 				ServletActionContext.getContext().getSession()
@@ -392,7 +391,6 @@ public class UserAction extends ActionSupport {
 			userService.uploadHeadPortrait(oulduser);
 			
 			jo.put("headImagePath", filename);
-//			jo.put("headImagePath", IMAGE_HEADER + realPath + File.separator + newFileName);
 			jo.put("result_code", SUCCESS);
 			jo.put("headImagePath", realPath + "\\" + newFileName);
 			jo.put("result_message", "修改成功");
@@ -443,15 +441,11 @@ public class UserAction extends ActionSupport {
 
 			// 为相册赋值
 			album.setUserId(loginUser.getUserId());
-//			album.setImagePath(realPath + "\\" + newFileName);
 			album.setImagePath(filename);
 
 			userService.uploadImageToAlbum(album);
-//			jsonObject.put("result_code", 200);
 			jsonObject.put("headImagePath", filename);
-//			jsonObject.put("headImagePath", realPath + "\\" + newFileName);
 			jsonObject.put("result_code", SUCCESS);
-			jsonObject.put("headImagePath", realPath + "\\" + newFileName);
 			jsonObject.put("result_message", "上传成功");
 		} else {
 			jsonObject.put("result_code", UNLOGIN_ERROR);
@@ -475,7 +469,7 @@ public class UserAction extends ActionSupport {
 				"pageSize");
 		JSONObject jo = new JSONObject();
 		Integer pageSum = 0;
-		if (loginUser != null && pageIndex != null && pageSize != null) {
+//		if (loginUser != null && pageIndex != null && pageSize != null) {
 			List<User> allUsers = userService.selectAllUser(
 					Integer.parseInt(pageIndex), Integer.parseInt(pageSize));
 			pageSum = allUsers.size();
@@ -485,7 +479,7 @@ public class UserAction extends ActionSupport {
 			jo.put("data", ja);
 			jo.put("pageCount", "共" + pageSum + "条记录");
 			jo.put("result_code", 200);
-		}
+//		}
 		writer.println(jo.toString());
 	}
 

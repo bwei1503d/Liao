@@ -22,6 +22,8 @@ import com.ringletter.dao.UserDao;
 
 @Repository
 public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
+	
+	
 	@Autowired
 	public void DI(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
@@ -54,7 +56,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				"from User where phone = ? and password = ?",
 				new Object[] { user.getPhone(), user.getPassword() });
 		if (list != null && list.size() > 0) {
-			return (User) list.get(0);
+			User tUser = (User) list.get(0) ;
+			if(user.getLat() != 0.0){
+				tUser.setLat(user.getLat());
+				tUser.setLng(user.getLng());
+			}
+			tUser.setLasttime(System.currentTimeMillis());
+			getHibernateTemplate().update(tUser);
+			return tUser ;
 		}
 		return null;
 	}
@@ -98,7 +107,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		getHibernateTemplate().save(relationship);
 	}
 
-	private List<Relationship> select(User user, int currPage, int pageSize) {// ˽�еĲ�ѯ�û��ĺ�����ϢID
+	private List<Relationship> select(User user, int currPage, int pageSize) {
 		int firstResult = currPage * pageSize;
 		Query query = getSession()
 				.createQuery("from Relationship where user_id=? ")
@@ -124,6 +133,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	@Override
 	public User selectUserById(User user) {
 		User u = getHibernateTemplate().get(User.class, user.getUserId());
+		
+		List find = getHibernateTemplate().find("from Album where userId=?",
+				user.getUserId());
+		u.setListAlbum(find);
 		return u;
 	}
 
