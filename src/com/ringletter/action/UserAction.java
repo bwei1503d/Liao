@@ -3,18 +3,14 @@ package com.ringletter.action;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,7 +23,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import com.ringletter.bean.Album;
@@ -50,15 +45,22 @@ public class UserAction extends ActionSupport {
 	@Autowired
 	private UserService userService;
 	
+	// 参数不对
+	public static int PARAMS_ERRPR = 300 ;
+	//用户未登录
+	public static int UNLOGIN_ERRPR = 301 ;
+	//服务端异常
+	public static int SERVER_ERRPR = 302 ;
+
+
 	
 	/**
 	 * 参数不全
 	 */
 	public void paramsError(JSONObject jsonObject){
 		try {
-			jsonObject.put("result_code", 400);
-			jsonObject.put("result_message", "手机号已存在");
-
+			jsonObject.put("result_code", 300);
+			jsonObject.put("result_message", "参数不全");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
