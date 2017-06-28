@@ -11,6 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
 
@@ -22,8 +23,7 @@ import com.ringletter.dao.UserDao;
 
 @Repository
 public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
-	
-	
+
 	@Autowired
 	public void DI(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
@@ -40,8 +40,13 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	}
 
 	@Override
-	public void register(User user) {
-		getHibernateTemplate().save(user);
+	public boolean register(User user) {
+
+		Integer userid = (Integer) getHibernateTemplate().save(user);
+		if(userid != null){
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -56,14 +61,14 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 				"from User where phone = ? and password = ?",
 				new Object[] { user.getPhone(), user.getPassword() });
 		if (list != null && list.size() > 0) {
-			User tUser = (User) list.get(0) ;
-			if(user.getLat() != 0.0){
+			User tUser = (User) list.get(0);
+			if (user.getLat() != 0.0) {
 				tUser.setLat(user.getLat());
 				tUser.setLng(user.getLng());
 			}
 			tUser.setLasttime(System.currentTimeMillis());
 			getHibernateTemplate().update(tUser);
-			return tUser ;
+			return tUser;
 		}
 		return null;
 	}
@@ -133,7 +138,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	@Override
 	public User selectUserById(User user) {
 		User u = getHibernateTemplate().get(User.class, user.getUserId());
-		
+
 		List find = getHibernateTemplate().find("from Album where userId=?",
 				user.getUserId());
 		u.setListAlbum(find);
@@ -149,8 +154,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	public List<Chat> selectChat(Chat chat, int pageIndex, int pageSize) {
 
 		String hql = "from Chat c where (c.userId = " + chat.getUserId()
-				+ " and c.touserId ="+chat.getTouserId()+" ) or (c.userId = " + chat.getTouserId()
-				+ " and c.touserId ="+chat.getUserId()+")order by c.messageTime desc";
+				+ " and c.touserId =" + chat.getTouserId()
+				+ " ) or (c.userId = " + chat.getTouserId()
+				+ " and c.touserId =" + chat.getUserId()
+				+ ")order by c.messageTime desc";
 		int firstResult = pageIndex * pageSize;
 		Query query = getSession().createQuery(hql).setFirstResult(firstResult)
 				.setMaxResults(pageSize);
@@ -178,7 +185,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public List<Album> selectUserAlbum(Album album) {
 		List find = getHibernateTemplate().find("from Album where userId=?",
