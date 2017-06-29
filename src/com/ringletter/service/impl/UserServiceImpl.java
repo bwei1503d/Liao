@@ -31,9 +31,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void register(User user) {
-		userDao.register(user);
+	public boolean register(User user) {
+		boolean result =  userDao.register(user);
 		com.ringletter.utils.Util.addUser(user.getUserId()+"", user.getYxpassword());
+		return result;
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import com.ringletter.bean.User;
 public interface UserDao {
 	List<User> selectByPhone(User user);// 验证手机号
 
-	void register(User user);// 注册用户
+	boolean register(User user);// 注册用户
 
 	void uploadHeadPortrait(User user);// 上传头像
 
