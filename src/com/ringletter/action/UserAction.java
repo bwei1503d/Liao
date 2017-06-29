@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,7 +50,6 @@ public class UserAction extends ActionSupport {
 	
 	
 	
-
 	
 
 	/**
