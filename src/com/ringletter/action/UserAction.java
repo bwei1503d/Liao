@@ -84,6 +84,8 @@ public class UserAction extends ActionSupport {
 			e.printStackTrace();
 		}
 	}
+	
+	
 
 	// 登录
 	public void login() throws Exception {
