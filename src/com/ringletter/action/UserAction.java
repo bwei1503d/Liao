@@ -47,7 +47,6 @@ public class UserAction extends ActionSupport {
 	@Autowired
 	private UserService userService;
 
-
 	public static final String IMAGE_HEADER = "http://qhb.2dyt.com";
 
 	/**
@@ -86,8 +85,6 @@ public class UserAction extends ActionSupport {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 	// 登录
 	public void login() throws Exception {
@@ -99,9 +96,8 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject = new JSONObject();
 		JSONObject jsonObject2 = new JSONObject();
 		try {
-			if (user != null && user.getPassword() != null
-					&& user.getPassword() != null && user.getPassword() != ""
-					&& user.getPhone() != "") {
+			if (user != null && !StringUtils.isEmpty(user.getPhone())
+					&& !StringUtils.isEmpty(user.getPassword())) {
 
 				User loginUser = userService.login(user);
 
@@ -121,6 +117,8 @@ public class UserAction extends ActionSupport {
 					jsonObject2.put("phone", loginUser.getPhone());
 					jsonObject2.put("introduce", loginUser.getIntroduce());
 					jsonObject2.put("imagePath", loginUser.getImagePath());
+					jsonObject2.put("lat", loginUser.getLat());
+					jsonObject2.put("lng", loginUser.getLng());
 					jsonObject2.put("lasttime", laftTime);
 					jsonObject2.put("createtime", createTime);
 					jsonObject.put("data", jsonObject2);
@@ -158,9 +156,8 @@ public class UserAction extends ActionSupport {
 		JSONObject jo = new JSONObject();
 		JSONObject jo1 = new JSONObject();
 		try {
-			if (user != null && user.getPassword() != null
-					&& user.getPassword() != null && user.getPassword() != ""
-					&& user.getPhone() != "") {
+			if (user != null && !StringUtils.isEmpty(user.getPhone())
+					&& !StringUtils.isEmpty(user.getPassword())) {
 
 				Boolean result = userService.selectByPhone(this.user);
 
@@ -296,7 +293,7 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 
 			String newPassword = request.getParameter("newPassword");
-			if (newPassword != null && newPassword != "") {
+			if (!StringUtils.isEmpty(newPassword)) {
 				User user2 = userService.updatePassword(newPassword);
 				if (user2 != null) {
 
@@ -349,10 +346,9 @@ public class UserAction extends ActionSupport {
 		try {
 			if (loginUser != null) {
 
-				if (user != null && user.getUserId() != null
-						&& user.getUserId() != 0 && user.getPassword() != null
-						&& user.getPassword() != "" && user.getPhone() != null
-						&& user.getPhone() != "") {
+				if (user != null && !StringUtils.isEmpty(user.getPhone())
+						&& !StringUtils.isEmpty(user.getPassword())
+						&& !StringUtils.isEmpty(user.getUserId().toString())) {
 
 					User user2 = userService.updateUser(user);
 					if (user2 != null) {
@@ -484,8 +480,7 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 
 			if (user.getFile() != null && user.getFile().isFile()
-					&& album.getAlbumName() != null
-					&& album.getAlbumName() != "") {
+					&& StringUtils.isEmpty(album.getAlbumName())) {
 
 				String realPath = ServletActionContext.getServletContext()
 						.getRealPath("/images");
@@ -555,8 +550,8 @@ public class UserAction extends ActionSupport {
 
 		if (loginUser != null) {
 			Integer pageSum = 0;
-			if (pageIndex != null && pageIndex != "" && pageSize != null
-					&& pageSize != "") {
+			if (!StringUtils.isEmpty(pageIndex)
+					&& !StringUtils.isEmpty(pageSize)) {
 				List<User> allUsers = userService
 						.selectAllUser(Integer.parseInt(pageIndex),
 								Integer.parseInt(pageSize));
@@ -647,8 +642,7 @@ public class UserAction extends ActionSupport {
 
 			if (loginUser != null) {
 				if (relationship != null && relationship.getFriendId() != null
-						&& relationship.getGroupName() != ""
-						&& relationship.getGroupName() != null
+						&& !StringUtils.isEmpty(relationship.getGroupName())
 						&& relationship.getFriendId() != 0) {
 
 					relationship.setUserId(loginUser.getUserId());
@@ -704,7 +698,7 @@ public class UserAction extends ActionSupport {
 						&& chat.getUserId() != 0 && chat.getTouserId() != null
 						&& chat.getTouserId() != 0
 						&& chat.getTouserId() != chat.getUserId()
-						&& chat.getMessage() != null && chat.getMessage() != "") {
+						&& !StringUtils.isEmpty(chat.getMessage())) {
 					long thisTime = System.currentTimeMillis();
 					chat.setMessageTime(thisTime);
 					String insertChat = userService.insertChat(chat);
@@ -756,8 +750,8 @@ public class UserAction extends ActionSupport {
 		Gson gson = new Gson();
 		if (loginUser != null) {
 
-			if (pageIndex != null && pageIndex != "" && pageSize != null
-					&& pageSize != "") {
+			if (!StringUtils.isEmpty(pageIndex)
+					&& !StringUtils.isEmpty(pageSize)) {
 
 				List<User> selectAllUserAndFriend = userService
 						.selectAllUserAndFriend(loginUser,
@@ -809,8 +803,8 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject = new JSONObject();
 
 		if (loginUser != null) {
-			if (pageIndex != null && pageIndex != "" && pageSize != null
-					&& pageSize != "") {
+			if (!StringUtils.isEmpty(pageIndex)
+					&& !StringUtils.isEmpty(pageSize)) {
 				List<Chat> selectChatList = userService
 						.selectChat(chat, Integer.parseInt(pageIndex),
 								Integer.parseInt(pageSize));
@@ -874,9 +868,9 @@ public class UserAction extends ActionSupport {
 						jsonObject.put("result_code", ALL_ERROR);
 						jsonObject.put("result_message", "相册为空");
 					}
-				}else{
+				} else {
 					jsonObject.put("result_code", PRARMS_ERROR);
-					jsonObject.put("result_message", "参数异常");					
+					jsonObject.put("result_message", "参数异常");
 				}
 
 			} else {
