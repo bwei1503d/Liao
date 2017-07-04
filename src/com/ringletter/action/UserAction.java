@@ -157,7 +157,11 @@ public class UserAction extends ActionSupport {
 		JSONObject jo1 = new JSONObject();
 		try {
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
-					&& !StringUtils.isEmpty(user.getPassword())) {
+					&& !StringUtils.isEmpty(user.getPassword())
+					&& !StringUtils.isEmpty(user.getNickname())
+					&& !StringUtils.isEmpty(user.getGender())
+					&& !StringUtils.isEmpty(user.getArea())
+					&& !StringUtils.isEmpty(user.getIntroduce())) {
 
 				Boolean result = userService.selectByPhone(this.user);
 
@@ -351,6 +355,7 @@ public class UserAction extends ActionSupport {
 						&& !StringUtils.isEmpty(user.getUserId().toString())) {
 
 					User user2 = userService.updateUser(user);
+					
 					if (user2 != null) {
 						ServletActionContext.getContext().getSession()
 								.put("loginUser", user2);
@@ -479,7 +484,7 @@ public class UserAction extends ActionSupport {
 
 		if (loginUser != null) {
 
-			if (user.getFile() != null && user.getFile().isFile()
+			if (user!= null && user.getFile() != null && user.getFile().isFile()
 					&& StringUtils.isEmpty(album.getAlbumName())) {
 
 				String realPath = ServletActionContext.getServletContext()
@@ -597,7 +602,7 @@ public class UserAction extends ActionSupport {
 
 		if (loginUser != null) {
 
-			if (user.getUserId() != null && user.getUserId() != 0) {
+			if (user!=null && user.getUserId() != null && user.getUserId() != 0) {
 				User u = userService.selectUserById(user);
 
 				jsonObject.put("result_code", SUCCESS);
