@@ -26,6 +26,15 @@ public class User implements java.io.Serializable {
 	private Long lasttime;
 	private Long createtime;
 	
+	//
+	private String sign ;
+	//rsa 加密的后key
+	private String secretkey ;
+	
+	//
+	private long currenttimer ;
+	
+	
 	private String yxpassword ;
 	
 	private double lat;
@@ -193,10 +202,44 @@ public class User implements java.io.Serializable {
 		this.listAlbum = listAlbum;
 	}
 
+	
+	
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+	
+	
+	
+
+	public String getSecretkey() {
+		return secretkey;
+	}
+
+	public void setSecretkey(String secretkey) {
+		this.secretkey = secretkey;
+	}
+	
+	
+	
+	
+
+	public long getCurrenttimer() {
+		return currenttimer;
+	}
+
+	public void setCurrenttimer(long currenttimer) {
+		this.currenttimer = currenttimer;
+	}
+
 	public User(Integer userId, String nickname, String password,
 			String gender, String area, String phone, String introduce,
 			String imagePath, Long lasttime, Long createtime, File file,
-			String fileFileName, String fileContentType,double lat,double lng,String yxpassword) {
+			String fileFileName, String fileContentType,double lat,double lng,String yxpassword,String sign
+			, String secretkey) {
 		super();
 		this.userId = userId;
 		this.nickname = nickname;
@@ -214,6 +257,18 @@ public class User implements java.io.Serializable {
 		this.lat = lat;
 		this.lng = lng;
 		this.yxpassword = yxpassword ;
+		this.sign = sign ;
+		this.secretkey = secretkey ;
+	}
+
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", nickname=" + nickname + ", password=" + password + ", gender=" + gender
+				+ ", area=" + area + ", phone=" + phone + ", introduce=" + introduce + ", imagePath=" + imagePath
+				+ ", lasttime=" + lasttime + ", createtime=" + createtime + ", sign=" + sign + ", secretkey="
+				+ secretkey + ", currenttimer=" + currenttimer + ", yxpassword=" + yxpassword + ", lat=" + lat
+				+ ", lng=" + lng + ", file=" + file + ", fileFileName=" + fileFileName + ", fileContentType="
+				+ fileContentType + ", listAlbum=" + listAlbum + "]";
 	}
 
 	

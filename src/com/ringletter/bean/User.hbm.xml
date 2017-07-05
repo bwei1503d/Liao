@@ -14,7 +14,7 @@
             <column name="nickname" length="10" not-null="true" />
         </property>
         <property name="password" type="java.lang.String">
-            <column name="password" length="10" not-null="true" />
+            <column name="password" length="50" not-null="true" />
         </property>
         <property name="gender" type="java.lang.String">
             <column name="gender" length="10" not-null="true" />

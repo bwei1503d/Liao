@@ -13,9 +13,9 @@ public class RsaTest {
 		try {
 			
 
-//			System.out.println(JNCryptorUtils.getInstance().decryptData("BEEst6ob8z+BlaDYJo95bQ==", "251JnB9F98rL8847"));
+			System.out.println(JNCryptorUtils.getInstance().decryptData("LcmJxmzKMlmp0GfahT3+jQ==", "837eCi8010n54Pqc"));
 
-			System.out.println(SecurityUtils.decrypt("z+Csvb8CrK6ogV4R+bNsmYlKhis0kfUe+U8Bw4i4VXwE6g4sIGcjoJooOr6VihbRmFxyjZLL0OHH2pbgCv8O1f/HgtFUmGxzLjzb33R7n1Dz0QcRfsblD3CHxnkDLlDESL85eQsktpJsxyvIa/rI7Wv+MXz+QSAM7OGYAy9w87g="));
+//			System.out.println(SecurityUtils.decrypt("TQyLtHx1F5RJutb0qLIRRP0CiBz4Hg/2C5CXlivUQqfBFhCR43XLs9/u4FjxCvncCmyQSadR8dIxOY2iQWzL7bxy1pqZ7gX+Qcb78n2NVXQZmhNAkyDKsLrHZ6IZ3tIw5GKJ6oBcOnDCf3CcGAL0lPAMNbODZipFyIXv4oeK8FE="));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

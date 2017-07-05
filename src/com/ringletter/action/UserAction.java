@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import com.ringletter.bean.Album;
 import com.ringletter.bean.Chat;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
+import com.ringletter.cipher.CipherUtils;
 import com.ringletter.service.UserService;
 import com.ringletter.utils.StringUtils;
 
@@ -53,6 +55,9 @@ public class UserAction extends ActionSupport {
 	 * 参数不对
 	 * */
 	public static int PRARMS_ERROR = 300;
+	
+	
+	
 
 	/**
 	 * 用户未登录
@@ -67,6 +72,13 @@ public class UserAction extends ActionSupport {
 	 * 失败 登录失败 注册失败 上传失败 手机号重复 添加好友失败 没有聊天记录 没有好友记录 没有相册记录
 	 * */
 	public static int ALL_ERROR = 303;
+	
+	/**
+	 * sign error 
+	 */
+	public static int SIGN_ERROR = 304;
+	
+	public static String SIGN_ERROR_INFOR = "验签失败" ;
 	/**
 	 * 成功
 	 * */
@@ -97,7 +109,19 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject2 = new JSONObject();
 		try {
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
-					&& !StringUtils.isEmpty(user.getPassword())) {
+					&& !StringUtils.isEmpty(user.getPassword()) && !StringUtils.isEmpty(user.getSign())) {
+				
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.phone", user.getPhone());
+				params.put("user.password", user.getPassword());
+				
+				if(!CipherUtils.vaildSign(params, user.getSign())){
+					jsonObject.put("result_code", ALL_ERROR);
+					jsonObject.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					return ;
+				}
+				
 
 				User loginUser = userService.login(user);
 
@@ -156,6 +180,9 @@ public class UserAction extends ActionSupport {
 		JSONObject jo = new JSONObject();
 		JSONObject jo1 = new JSONObject();
 		try {
+			
+			System.out.println(user.toString());
+			
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
 					&& !StringUtils.isEmpty(user.getPassword())) {
 

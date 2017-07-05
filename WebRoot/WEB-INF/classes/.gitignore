@@ -1,3 +1,4 @@
-/applicationContext.xml
 /com/
-/struts.xml
+/rsa_private_key.pem
+/rsa_private_key_pkcs8.pem
+/rsa_public_key.pem
