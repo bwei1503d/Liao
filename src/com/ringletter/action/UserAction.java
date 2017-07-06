@@ -119,6 +119,8 @@ public class UserAction extends ActionSupport {
 					jsonObject.put("result_code", ALL_ERROR);
 					jsonObject.put("result_message",
 							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					writer.println(jsonObject.toString());
+
 					return ;
 				}
 				
@@ -181,14 +183,33 @@ public class UserAction extends ActionSupport {
 		JSONObject jo1 = new JSONObject();
 		try {
 			
-			System.out.println(user.toString());
 			
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
 					&& !StringUtils.isEmpty(user.getPassword())
 					&& !StringUtils.isEmpty(user.getNickname())
 					&& !StringUtils.isEmpty(user.getGender())
 					&& !StringUtils.isEmpty(user.getArea())
+					&& !StringUtils.isEmpty(user.getAge())
 					&& !StringUtils.isEmpty(user.getIntroduce())) {
+				
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.phone", user.getPhone());
+				params.put("user.password", user.getPassword());
+				params.put("user.nickname", user.getNickname());
+				params.put("user.gender", user.getGender());
+				params.put("user.age", user.getAge());
+				params.put("user.area", user.getArea());
+				params.put("user.introduce", user.getIntroduce());
+				
+				if(!CipherUtils.vaildSign(params, user.getSign())){
+					jo.put("result_code", ALL_ERROR);
+					jo.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					out.println(jo.toString());
+
+					return ;
+				}
+				
 
 				Boolean result = userService.selectByPhone(this.user);
 

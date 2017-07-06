@@ -19,6 +19,9 @@
         <property name="gender" type="java.lang.String">
             <column name="gender" length="10" not-null="true" />
         </property>
+        <property name="age" type="java.lang.String">
+            <column name="age" length="2" not-null="true" />
+        </property>
         <property name="area" type="java.lang.String">
             <column name="area" length="25" not-null="true" />
         </property>

@@ -22,8 +22,8 @@ public class CipherUtils {
 	public static boolean vaildSign(Map<String,String> map,String sign){
 		if(getSign(map) == null || "".equals(getSign(map))){
 			return false ;
-		}
-		if(!sign.equals(getSign(map))){
+		}		
+		if(!sign.equals(getSign(sortString(map)))){
 			return false;
 		}
 		return true ;
@@ -36,14 +36,16 @@ public class CipherUtils {
 		String result = "" ;
 		try {
 			StringBuilder sb = new StringBuilder();
-			sb.append("appkey=APP_KEY&");
+			sb.append("appkey=1DLKlkdd&");
 			Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<String, String> entry = it.next();
 				sb.append(entry.getKey()+"=");
 				sb.append(entry.getValue()+"&");
 			}
-			result = sb.toString().substring(0, sb.toString().length()-1).replaceAll("'","‘" ).replaceAll("\"","“").replaceAll("<", "＜").replace(">", "＞") ;
+			result = sb.toString().substring(0, sb.toString().length()-1);
+//					.replaceAll("'","‘" ).replaceAll("\"","“").replaceAll("<", "＜").replace(">", "＞") ;
+			System.out.println("laststring : " + result);
 			result =  getMD5(result.trim());
 
 		} catch (Exception e) {

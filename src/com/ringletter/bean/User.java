@@ -21,6 +21,7 @@ public class User implements java.io.Serializable {
 	private String gender;
 	private String area;
 	private String phone;
+	private String age;
 	private String introduce;
 	private String imagePath;
 	private Long lasttime;
@@ -226,6 +227,14 @@ public class User implements java.io.Serializable {
 	
 	
 	
+
+	public String getAge() {
+		return age;
+	}
+
+	public void setAge(String age) {
+		this.age = age;
+	}
 
 	public long getCurrenttimer() {
 		return currenttimer;
