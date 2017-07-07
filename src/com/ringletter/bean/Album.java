@@ -10,7 +10,7 @@ public class Album implements java.io.Serializable {
 
 	private Integer albumId;
 	private Integer userId;
-	private String albumName;
+//	private String albumName;
 	private String imagePath;
 
 	// Constructors
@@ -25,9 +25,9 @@ public class Album implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Album(Integer userId, String albumName, String imagePath) {
+	public Album(Integer userId,  String imagePath) {
 		this.userId = userId;
-		this.albumName = albumName;
+//		this.albumName = albumName;
 		this.imagePath = imagePath;
 	}
 
@@ -48,14 +48,14 @@ public class Album implements java.io.Serializable {
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
-
-	public String getAlbumName() {
-		return this.albumName;
-	}
-
-	public void setAlbumName(String albumName) {
-		this.albumName = albumName;
-	}
+//
+//	public String getAlbumName() {
+//		return this.albumName;
+//	}
+//
+//	public void setAlbumName(String albumName) {
+//		this.albumName = albumName;
+//	}
 
 	public String getImagePath() {
 		return this.imagePath;

@@ -13,9 +13,9 @@
         <property name="userId" type="java.lang.Integer">
             <column name="user_id" not-null="true" />
         </property>
-        <property name="albumName" type="java.lang.String">
+      <!--   <property name="albumName" type="java.lang.String">
             <column name="album_name" length="100" />
-        </property>
+        </property> -->
         <property name="imagePath" type="java.lang.String">
             <column name="image_path" length="200" not-null="true" />
         </property>

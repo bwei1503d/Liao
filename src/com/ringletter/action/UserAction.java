@@ -34,6 +34,8 @@ import com.ringletter.bean.Chat;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 import com.ringletter.cipher.CipherUtils;
+import com.ringletter.cipher.JNCryptorUtils;
+import com.ringletter.cipher.SecurityUtils;
 import com.ringletter.service.UserService;
 import com.ringletter.utils.StringUtils;
 
@@ -109,20 +111,35 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject2 = new JSONObject();
 		try {
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
-					&& !StringUtils.isEmpty(user.getPassword()) && !StringUtils.isEmpty(user.getSign())) {
+					&& !StringUtils.isEmpty(user.getPassword()) 
+					&& !StringUtils.isEmpty(user.getSign())
+					&& !StringUtils.isEmpty(user.getSecretkey())) {
 				
 				Map<String,String> params = new HashMap<String, String>();
 				params.put("user.phone", user.getPhone());
 				params.put("user.password", user.getPassword());
+				params.put("user.secretkey", user.getSecretkey());
+				if(user.getLat() != 0.0 && user.getLng() != 0.0){
+					params.put("user.lat", user.getLat()+"");
+					params.put("user.lng", user.getLng()+"");
+				}
 				
 				if(!CipherUtils.vaildSign(params, user.getSign())){
 					jsonObject.put("result_code", ALL_ERROR);
 					jsonObject.put("result_message",
 							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
 					writer.println(jsonObject.toString());
-
 					return ;
 				}
+				
+				String secretkey = user.getSecretkey() ;
+				String rsaDecode =  SecurityUtils.decrypt(secretkey);
+				String phone = JNCryptorUtils.getInstance().decryptData(user.getPhone(), rsaDecode);
+				user.setPhone(phone);
+				
+				// 解密用户的手机号码 手机号码在传输中 隐私数据
+//				JNCryptorUtils.getInstance().decryptData("LcmJxmzKMlmp0GfahT3+jQ==", "837eCi8010n54Pqc");
+
 				
 
 				User loginUser = userService.login(user);
@@ -199,7 +216,12 @@ public class UserAction extends ActionSupport {
 				params.put("user.gender", user.getGender());
 				params.put("user.age", user.getAge());
 				params.put("user.area", user.getArea());
+				if(user.getLat() != 0.0 && user.getLng() != 0.0){
+					params.put("user.lat", user.getLat()+"");
+					params.put("user.lng", user.getLng()+"");
+				}
 				params.put("user.introduce", user.getIntroduce());
+				
 				
 				if(!CipherUtils.vaildSign(params, user.getSign())){
 					jo.put("result_code", ALL_ERROR);
@@ -263,9 +285,10 @@ public class UserAction extends ActionSupport {
 
 	}
 
-	// 上传图片
+	// 上传图片 形象照
 	public void uploadImage() throws Exception {
 
+		System.out.println("uploadImage");
 		HttpServletResponse response = ServletActionContext.getResponse();
 		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
@@ -275,7 +298,22 @@ public class UserAction extends ActionSupport {
 		User loginUser = (User) ServletActionContext.getContext().getSession()
 				.get("loginUser");
 		if (loginUser != null) {
-			if (user.getFile() != null && user.getFile().isFile()) {
+			if (user.getFile() != null && user.getFile().isFile()
+					&& !StringUtils.isEmpty(user.getCurrenttimer())
+					&& !StringUtils.isEmpty(user.getSign())) {
+				
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.currenttimer", user.getCurrenttimer());
+				
+				if(!CipherUtils.vaildSign(params, user.getSign())){
+					jo.put("result_code", ALL_ERROR);
+					jo.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					out.println(jo.toString());
+
+					return ;
+				}
+				
 				String realPath = ServletActionContext.getServletContext()
 						.getRealPath("/images");
 				System.out.println(realPath);
@@ -303,7 +341,6 @@ public class UserAction extends ActionSupport {
 					jo.put("headImagePath", filename);
 
 					jo.put("result_code", SUCCESS);
-					jo.put("headImagePath", realPath + "\\" + newFileName);
 					jo.put("result_message", "上传成功");
 
 				} catch (Exception e) {
@@ -496,7 +533,6 @@ public class UserAction extends ActionSupport {
 
 					jo.put("headImagePath", filename);
 					jo.put("result_code", SUCCESS);
-					jo.put("headImagePath", realPath + "\\" + newFileName);
 					jo.put("result_message", "修改成功");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -533,7 +569,20 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 
 			if (user!= null && user.getFile() != null && user.getFile().isFile()
-					&& StringUtils.isEmpty(album.getAlbumName())) {
+//					&& StringUtils.isEmpty(album.getAlbumName()) 
+					&& !StringUtils.isEmpty(user.getCurrenttimer())
+					&& !StringUtils.isEmpty(user.getSign())) {
+				
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.currenttimer", user.getCurrenttimer());
+				
+				if(!CipherUtils.vaildSign(params, user.getSign())){
+					jsonObject.put("result_code", ALL_ERROR);
+					jsonObject.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					writer.println(jsonObject.toString());
+					return ;
+				}
 
 				String realPath = ServletActionContext.getServletContext()
 						.getRealPath("/images");

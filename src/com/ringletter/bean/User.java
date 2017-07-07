@@ -33,7 +33,6 @@ public class User implements java.io.Serializable {
 	private String secretkey ;
 	
 	//
-	private long currenttimer ;
 	
 	
 	private String yxpassword ;
@@ -42,6 +41,10 @@ public class User implements java.io.Serializable {
 	private double lng;
 
 	private File file;
+	//时间蹉  验签
+	private String currenttimer ;
+
+	
 	private String fileFileName;
 	private String fileContentType;
 	
@@ -236,11 +239,11 @@ public class User implements java.io.Serializable {
 		this.age = age;
 	}
 
-	public long getCurrenttimer() {
+	public String getCurrenttimer() {
 		return currenttimer;
 	}
 
-	public void setCurrenttimer(long currenttimer) {
+	public void setCurrenttimer(String currenttimer) {
 		this.currenttimer = currenttimer;
 	}
 

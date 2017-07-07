@@ -30,7 +30,7 @@ public class CipherUtils {
 	}
 	
 	
-	static final String APP_KEY = "7DFinf08" ; 
+//	static final String APP_KEY = "7DFinf08" ; 
 	
 	public static String getSign(Map<String,String> map){
 		String result = "" ;
