@@ -242,6 +242,11 @@ public class UserAction extends ActionSupport {
 					user.setLasttime(d);
 					user.setYxpassword(StringUtils.getStringRandom(8));
 
+					if(user.getGender().equals("男")){
+						user.setImagePath("http://dyt-pict.oss-cn-beijing.aliyuncs.com/dliao/default_man.jpg");
+					}else{
+						user.setImagePath("http://dyt-pict.oss-cn-beijing.aliyuncs.com/dliao/default_woman.jpg");
+					}
 					boolean isreg = userService.register(user);
 					if (isreg) {
 						ActionContext.getContext().getSession()
@@ -312,6 +317,19 @@ public class UserAction extends ActionSupport {
 					out.println(jo.toString());
 
 					return ;
+				}
+				
+				// 删掉原图片
+				try {
+					String ouldpath = loginUser.getImagePath();
+					if (!StringUtils.isEmpty(ouldpath)) {
+						File f = new File(ouldpath);
+						if(f.exists()){
+							f.delete();
+						}
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 				
 				String realPath = ServletActionContext.getServletContext()
@@ -507,8 +525,8 @@ public class UserAction extends ActionSupport {
 
 				String realPath = ServletActionContext.getServletContext()
 						.getRealPath("/images");
-				System.out.println(realPath);
-				System.out.println(user.getFileFileName());
+//				System.out.println(realPath);
+//				System.out.println(user.getFileFileName());
 
 				String newFileName = UUID.randomUUID().toString()
 						+ user.getFileFileName().substring(
@@ -528,7 +546,6 @@ public class UserAction extends ActionSupport {
 							+ "MyInterface" + File.separator + "images"
 							+ File.separator + newFileName;
 					loginUser.setImagePath(filename);
-					// oulduser.setImagePath(realPath + newFileName);
 					userService.uploadHeadPortrait(loginUser);
 
 					jo.put("headImagePath", filename);
@@ -641,41 +658,49 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter writer = response.getWriter();
 
-		User loginUser = (User) ServletActionContext.getContext().getSession()
-				.get("loginUser");
+//		User loginUser = (User) ServletActionContext.getContext().getSession()
+//				.get("loginUser");
 
 		String pageIndex = ServletActionContext.getRequest().getParameter(
 				"pageIndex");
 		String pageSize = ServletActionContext.getRequest().getParameter(
 				"pageSize");
+		String sign = ServletActionContext.getRequest().getParameter(
+				"sign");
 		JSONObject jo = new JSONObject();
 
-		if (loginUser != null) {
-			Integer pageSum = 0;
-			if (!StringUtils.isEmpty(pageIndex)
-					&& !StringUtils.isEmpty(pageSize)) {
-				List<User> allUsers = userService
-						.selectAllUser(Integer.parseInt(pageIndex),
-								Integer.parseInt(pageSize));
-
-				pageSum = allUsers.size();
-				Gson g = new Gson();
-				String ujson = g.toJson(allUsers);
-				JSONArray ja = new JSONArray(ujson);
-				jo.put("data", ja);
-				jo.put("pageCount", "共" + pageSum + "条记录");
-				jo.put("result_code", SUCCESS);
-				jo.put("result_message", "查询成功");
-			} else {
-				jo.put("result_code", PRARMS_ERROR);
-				jo.put("result_message", "参数异常");
+		Integer pageSum = 0;
+		if (StringUtils.isDigit(pageIndex) && StringUtils.isDigit(pageSize) && !StringUtils.isEmpty(pageIndex) && !StringUtils.isEmpty(pageSize)&& !StringUtils.isEmpty(sign)) {
+			
+			
+			
+			Map<String,String> params = new HashMap<String, String>();
+			params.put("pageIndex", pageIndex);
+			params.put("pageSize", pageSize);
+		
+			if(!CipherUtils.vaildSign(params, sign)){
+				jo.put("result_code", ALL_ERROR);
+				jo.put("result_message",
+						URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+				writer.println(jo.toString());
+				return ;
 			}
-
+			
+			List<User> allUsers = userService.selectAllUser(Integer.parseInt(pageIndex), Integer.parseInt(pageSize));
+			for(int i=0;i<allUsers.size();i++){
+				allUsers.get(i).setPassword("");
+			}
+			pageSum = allUsers.size();
+			Gson g = new Gson();
+			String ujson = g.toJson(allUsers);
+			JSONArray ja = new JSONArray(ujson);
+			jo.put("data", ja);
+			jo.put("pageCount", "共" + pageSum + "条记录");
+			jo.put("result_code", SUCCESS);
+			jo.put("result_message", "查询成功");
 		} else {
-
-			jo.put("result_code", UNLOGIN_ERROR);
-			jo.put("result_message", "用户未登录");
-
+			jo.put("result_code", PRARMS_ERROR);
+			jo.put("result_message", "参数异常");
 		}
 		writer.println(jo.toString());
 
@@ -697,35 +722,42 @@ public class UserAction extends ActionSupport {
 		JSONObject jsonObject = new JSONObject();
 		JSONObject jsonObject2 = new JSONObject();
 
-		if (loginUser != null) {
-
-			if (user!=null && user.getUserId() != null && user.getUserId() != 0) {
-				User u = userService.selectUserById(user);
-
-				jsonObject.put("result_code", SUCCESS);
-				jsonObject.put("result_message", "success");
-
-				long laftTime = System.currentTimeMillis();
-				long createTime = u.getCreatetime();
-				jsonObject2.put("userId", u.getUserId());
-				jsonObject2.put("nickname", u.getNickname());
-				jsonObject2.put("gender", loginUser.getGender());
-				jsonObject2.put("area", loginUser.getArea());
-				jsonObject2.put("introduce", loginUser.getIntroduce());
-				jsonObject2.put("imagePath", loginUser.getImagePath());
-				jsonObject2.put("lasttime", laftTime);
-				jsonObject2.put("createtime", createTime);
-				jsonObject.put("data", jsonObject2);
-			} else {
-				jsonObject.put("result_code", PRARMS_ERROR);
-				jsonObject.put("result_message", "参数异常");
+		if (user!=null && user.getUserId() != null && user.getUserId() != 0
+				&& !StringUtils.isEmpty(user.getSign()) ) {
+			
+			Map<String,String> params = new HashMap<String, String>();
+			params.put("user.userId", user.getUserId()+"");
+			
+			
+			if(!CipherUtils.vaildSign(params, user.getSign())){
+				jsonObject.put("result_code", ALL_ERROR);
+				jsonObject.put("result_message",
+						URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+				writer.println(jsonObject.toString());
+				return ;
 			}
+			
+			User u = userService.selectUserById(user);
 
+			jsonObject.put("result_code", SUCCESS);
+			jsonObject.put("result_message", "success");
+
+			long laftTime = System.currentTimeMillis();
+			long createTime = u.getCreatetime();
+			jsonObject2.put("userId", u.getUserId());
+			jsonObject2.put("nickname", u.getNickname());
+			jsonObject2.put("gender", loginUser.getGender());
+			jsonObject2.put("area", loginUser.getArea());
+			jsonObject2.put("introduce", loginUser.getIntroduce());
+			jsonObject2.put("imagePath", loginUser.getImagePath());
+			jsonObject2.put("lasttime", laftTime);
+			jsonObject2.put("createtime", createTime);
+			jsonObject2.put("photolist",u.getListAlbum());
+			jsonObject.put("data", jsonObject2);
 		} else {
-			jsonObject.put("result_code", UNLOGIN_ERROR);
-			jsonObject.put("result_message", "用户未登录");
+			jsonObject.put("result_code", PRARMS_ERROR);
+			jsonObject.put("result_message", "参数异常");
 		}
-
 		writer.println(jsonObject);
 	}
 

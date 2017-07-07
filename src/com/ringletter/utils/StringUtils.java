@@ -1,6 +1,8 @@
 package com.ringletter.utils;
 
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringUtils {
 	
@@ -40,6 +42,13 @@ public class StringUtils {
 		
 		return false ;
 		
+	}
+	
+	// 判断一个字符串是否都为数字  
+	public static boolean isDigit(String strNum) {  
+	    Pattern pattern = Pattern.compile("[0-9]{1,}");  
+	    Matcher matcher = pattern.matcher((CharSequence) strNum);  
+	    return matcher.matches();  
 	}
 
 }

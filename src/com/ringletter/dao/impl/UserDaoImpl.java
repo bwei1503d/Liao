@@ -29,6 +29,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		setSessionFactory(sessionFactory);
 	}
 
+	
 	@Override
 	public List<User> selectByPhone(User user) {
 		if (user != null && user.getPhone() != null) {
