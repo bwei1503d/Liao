@@ -14,6 +14,12 @@ public class Album implements java.io.Serializable {
 	private String imagePath;
 
 	// Constructors
+	
+	//图片的宽高
+		private int picWidth;
+		private int picHeight;
+		private long timer ;
+
 
 	/** default constructor */
 	public Album() {
@@ -64,5 +70,32 @@ public class Album implements java.io.Serializable {
 	public void setImagePath(String imagePath) {
 		this.imagePath = imagePath;
 	}
+
+	public int getPicWidth() {
+		return picWidth;
+	}
+
+	public void setPicWidth(int picWidth) {
+		this.picWidth = picWidth;
+	}
+
+	public int getPicHeight() {
+		return picHeight;
+	}
+
+	public void setPicHeight(int picHeight) {
+		this.picHeight = picHeight;
+	}
+
+	public long getTimer() {
+		return timer;
+	}
+
+	public void setTimer(long timer) {
+		this.timer = timer;
+	}
+	
+	
+	
 
 }

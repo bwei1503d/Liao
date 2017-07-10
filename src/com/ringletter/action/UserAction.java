@@ -244,7 +244,11 @@ public class UserAction extends ActionSupport {
 
 					if(user.getGender().equals("男")){
 						user.setImagePath("http://dyt-pict.oss-cn-beijing.aliyuncs.com/dliao/default_man.jpg");
+						user.setPicWidth(510);
+						user.setPicHeight(507);
 					}else{
+						user.setPicWidth(700);
+						user.setPicHeight(742);
 						user.setImagePath("http://dyt-pict.oss-cn-beijing.aliyuncs.com/dliao/default_woman.jpg");
 					}
 					boolean isreg = userService.register(user);
@@ -305,13 +309,16 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 			if (user.getFile() != null && user.getFile().isFile()
 					&& !StringUtils.isEmpty(user.getCurrenttimer())
-					&& !StringUtils.isEmpty(user.getSign())) {
+					&& !StringUtils.isEmpty(user.getSign())
+					&& user.getPicWidth() != 0 && user.getPicHeight() != 0  ) {
 				
 				Map<String,String> params = new HashMap<String, String>();
 				params.put("user.currenttimer", user.getCurrenttimer());
+				params.put("user.picWidth", user.getPicWidth()+"");
+				params.put("user.picHeight", user.getPicHeight()+"");
 				
 				if(!CipherUtils.vaildSign(params, user.getSign())){
-					jo.put("result_code", ALL_ERROR);
+					jo.put("result_code",SIGN_ERROR);
 					jo.put("result_message",
 							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
 					out.println(jo.toString());
@@ -353,6 +360,8 @@ public class UserAction extends ActionSupport {
 							+ File.separator + newFileName;
 
 					loginUser.setImagePath(filename);
+					loginUser.setPicWidth(user.getPicWidth());
+					loginUser.setPicHeight(user.getPicHeight());
 
 					userService.uploadHeadPortrait(loginUser);
 
@@ -500,77 +509,78 @@ public class UserAction extends ActionSupport {
 		writer.flush();
 	}
 
-	// 修改基本信息中的修改头像
-	public void updateuploadImage() throws Exception {
-
-		HttpServletResponse response = ServletActionContext.getResponse();
-		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
-		response.setCharacterEncoding("utf-8");
-		response.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		JSONObject jo = new JSONObject();
-		User loginUser = (User) ServletActionContext.getContext().getSession()
-				.get("loginUser");
-		if (loginUser != null) {
-
-			if (user != null && user.getFile().isFile()
-					&& user.getFile() != null) {
-
-				// 删掉原图片
-				String ouldpath = loginUser.getImagePath();
-				if (!StringUtils.isEmpty(ouldpath)) {
-					File f = new File(ouldpath);
-					f.delete();
-				}
-
-				String realPath = ServletActionContext.getServletContext()
-						.getRealPath("/images");
-//				System.out.println(realPath);
-//				System.out.println(user.getFileFileName());
-
-				String newFileName = UUID.randomUUID().toString()
-						+ user.getFileFileName().substring(
-								user.getFileFileName().lastIndexOf("."));
-
-				InputStream is = null;
-				OutputStream os = null;
-				try {
-					is = new FileInputStream(user.getFile());
-					os = new FileOutputStream(realPath + "/" + newFileName);
-					int i = is.read();
-					while (i != -1) {
-						os.write(i);
-						i = is.read();
-					}
-					String filename = IMAGE_HEADER + File.separator
-							+ "MyInterface" + File.separator + "images"
-							+ File.separator + newFileName;
-					loginUser.setImagePath(filename);
-					userService.uploadHeadPortrait(loginUser);
-
-					jo.put("headImagePath", filename);
-					jo.put("result_code", SUCCESS);
-					jo.put("result_message", "修改成功");
-				} catch (Exception e) {
-					e.printStackTrace();
-					jo.put("result_code", SERVER_ERROR);
-					jo.put("result_message", "修改失败");
-				} finally {
-					is.close();
-					os.close();
-				}
-			} else {
-				jo.put("result_code", PRARMS_ERROR);
-				jo.put("result_message", "参数异常");
-			}
-		} else {
-			jo.put("result_code", UNLOGIN_ERROR);
-			jo.put("result_message", "用户未登录");
-		}
-		out.println(jo.toString());
-		out.flush();
-		// out.close();
-	}
+//	
+//	// 修改基本信息中的修改头像
+//	public void updateuploadImage() throws Exception {
+//
+//		HttpServletResponse response = ServletActionContext.getResponse();
+//		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
+//		response.setCharacterEncoding("utf-8");
+//		response.setContentType("text/html;charset=UTF-8");
+//		PrintWriter out = response.getWriter();
+//		JSONObject jo = new JSONObject();
+//		User loginUser = (User) ServletActionContext.getContext().getSession()
+//				.get("loginUser");
+//		if (loginUser != null) {
+//
+//			if (user != null && user.getFile().isFile()
+//					&& user.getFile() != null) {
+//
+//				// 删掉原图片
+//				String ouldpath = loginUser.getImagePath();
+//				if (!StringUtils.isEmpty(ouldpath)) {
+//					File f = new File(ouldpath);
+//					f.delete();
+//				}
+//
+//				String realPath = ServletActionContext.getServletContext()
+//						.getRealPath("/images");
+////				System.out.println(realPath);
+////				System.out.println(user.getFileFileName());
+//
+//				String newFileName = UUID.randomUUID().toString()
+//						+ user.getFileFileName().substring(
+//								user.getFileFileName().lastIndexOf("."));
+//
+//				InputStream is = null;
+//				OutputStream os = null;
+//				try {
+//					is = new FileInputStream(user.getFile());
+//					os = new FileOutputStream(realPath + "/" + newFileName);
+//					int i = is.read();
+//					while (i != -1) {
+//						os.write(i);
+//						i = is.read();
+//					}
+//					String filename = IMAGE_HEADER + File.separator
+//							+ "MyInterface" + File.separator + "images"
+//							+ File.separator + newFileName;
+//					loginUser.setImagePath(filename);
+//					userService.uploadHeadPortrait(loginUser);
+//
+//					jo.put("headImagePath", filename);
+//					jo.put("result_code", SUCCESS);
+//					jo.put("result_message", "修改成功");
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					jo.put("result_code", SERVER_ERROR);
+//					jo.put("result_message", "修改失败");
+//				} finally {
+//					is.close();
+//					os.close();
+//				}
+//			} else {
+//				jo.put("result_code", PRARMS_ERROR);
+//				jo.put("result_message", "参数异常");
+//			}
+//		} else {
+//			jo.put("result_code", UNLOGIN_ERROR);
+//			jo.put("result_message", "用户未登录");
+//		}
+//		out.println(jo.toString());
+//		out.flush();
+//		// out.close();
+//	}
 
 	// 将照片上传到相册中去
 	public void uploadPhotoAlbum() throws Exception {
@@ -586,12 +596,15 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 
 			if (user!= null && user.getFile() != null && user.getFile().isFile()
-//					&& StringUtils.isEmpty(album.getAlbumName()) 
 					&& !StringUtils.isEmpty(user.getCurrenttimer())
-					&& !StringUtils.isEmpty(user.getSign())) {
+					&& !StringUtils.isEmpty(user.getSign())
+					&& user.getPicWidth() != 0 && user.getPicHeight() != 0 ) {
+				
 				
 				Map<String,String> params = new HashMap<String, String>();
 				params.put("user.currenttimer", user.getCurrenttimer());
+				params.put("user.picWidth", user.getPicWidth()+"");
+				params.put("user.picHeight", user.getPicHeight()+"");
 				
 				if(!CipherUtils.vaildSign(params, user.getSign())){
 					jsonObject.put("result_code", ALL_ERROR);
@@ -622,8 +635,15 @@ public class UserAction extends ActionSupport {
 							+ File.separator + newFileName;
 
 					// 为相册赋值
+					if(album == null){
+						album = new Album();
+					}
 					album.setUserId(loginUser.getUserId());
 					album.setImagePath(filename);
+					album.setTimer(System.currentTimeMillis());
+					
+					album.setPicWidth(user.getPicWidth());
+					album.setPicHeight(user.getPicHeight());
 
 					userService.uploadImageToAlbum(album);
 					jsonObject.put("headImagePath", filename);
@@ -666,7 +686,7 @@ public class UserAction extends ActionSupport {
 		String pageSize = ServletActionContext.getRequest().getParameter(
 				"pageSize");
 		String sign = ServletActionContext.getRequest().getParameter(
-				"sign");
+				"user.sign");
 		JSONObject jo = new JSONObject();
 
 		Integer pageSum = 0;

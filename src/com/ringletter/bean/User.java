@@ -43,6 +43,10 @@ public class User implements java.io.Serializable {
 	private File file;
 	//时间蹉  验签
 	private String currenttimer ;
+	
+	//图片的宽高
+	private int picWidth;
+	private int picHeight;
 
 	
 	private String fileFileName;
@@ -245,6 +249,26 @@ public class User implements java.io.Serializable {
 
 	public void setCurrenttimer(String currenttimer) {
 		this.currenttimer = currenttimer;
+	}
+	
+	
+	
+	
+
+	public int getPicWidth() {
+		return picWidth;
+	}
+
+	public void setPicWidth(int picWidth) {
+		this.picWidth = picWidth;
+	}
+
+	public int getPicHeight() {
+		return picHeight;
+	}
+
+	public void setPicHeight(int picHeight) {
+		this.picHeight = picHeight;
 	}
 
 	public User(Integer userId, String nickname, String password,

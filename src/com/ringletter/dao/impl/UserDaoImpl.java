@@ -54,6 +54,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	public void uploadHeadPortrait(User user) {
 		User u = getHibernateTemplate().get(User.class, user.getUserId());
 		u.setImagePath(user.getImagePath());
+		u.setPicWidth(user.getPicWidth());
+		u.setPicHeight(user.getPicHeight());
 	}
 
 	@Override
