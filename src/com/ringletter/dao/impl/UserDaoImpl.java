@@ -27,6 +27,8 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	@Autowired
 	public void DI(SessionFactory sessionFactory) {
 		setSessionFactory(sessionFactory);
+		
+		
 	}
 
 	
