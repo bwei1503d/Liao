@@ -125,8 +125,8 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public List<User> selectAllUser(int pageIndex, int pageSize) {
-		return userDao.selectAllUser(pageIndex, pageSize);
+	public List<User> selectAllUser(int pageIndex, int pageSize , long currenttimer) {
+		return userDao.selectAllUser(pageIndex, pageSize , currenttimer);
 	}
 
 	@Override

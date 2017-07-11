@@ -23,7 +23,7 @@ public interface UserService {
 
 	User updateUser(User user);// 修改用户基本信息
 
-	List<User> selectAllUser(int pageIndex, int pageSize);// 查询出来所有的注册过的用户并且分页
+	List<User> selectAllUser(int pageIndex, int pageSize , long currenttimer);// 查询出来所有的注册过的用户并且分页
 
 	List<User> selectAllUserAndFriend(User user, int pageIndex, int pageSize);// 查询出来用户的所有好友
 
