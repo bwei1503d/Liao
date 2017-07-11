@@ -22,7 +22,7 @@ public interface UserDao {
 
 	User updateUser(User user);// 修改用户基本信息
 
-	public List<User> selectAllUser(int pageIndex, int pageSize , long currenttimer);// 查询出来所有注册过的用户并分页
+	public List<User> selectAllUser(long currenttimer);// 查询出来所有注册过的用户并分页
 
 	List<User> selectAllUserAndFriend(User user, int pageIndex, int pageSize);// 查询出来用户的所有好友并分页
 
