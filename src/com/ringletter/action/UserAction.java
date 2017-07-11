@@ -687,17 +687,18 @@ public class UserAction extends ActionSupport {
 				"pageSize");
 		String sign = ServletActionContext.getRequest().getParameter(
 				"user.sign");
+		String currtime = ServletActionContext.getRequest().getParameter("user.currenttimer");
 		JSONObject jo = new JSONObject();
 
 		Integer pageSum = 0;
-		if (StringUtils.isDigit(pageIndex) && StringUtils.isDigit(pageSize) && !StringUtils.isEmpty(pageIndex) && !StringUtils.isEmpty(pageSize)&& !StringUtils.isEmpty(sign)) {
+		if (StringUtils.isCurrtime(currtime)&& ! StringUtils.isEmpty(currtime) && StringUtils.isDigit(pageIndex) && StringUtils.isDigit(pageSize) && !StringUtils.isEmpty(pageIndex) && !StringUtils.isEmpty(pageSize)&& !StringUtils.isEmpty(sign)) {
 			
 			
 			
 			Map<String,String> params = new HashMap<String, String>();
 			params.put("pageIndex", pageIndex);
 			params.put("pageSize", pageSize);
-		
+			params.put("user.currenttimer", currtime);
 			if(!CipherUtils.vaildSign(params, sign)){
 				jo.put("result_code", ALL_ERROR);
 				jo.put("result_message",
@@ -706,7 +707,7 @@ public class UserAction extends ActionSupport {
 				return ;
 			}
 			
-			List<User> allUsers = userService.selectAllUser(Integer.parseInt(pageIndex), Integer.parseInt(pageSize));
+			List<User> allUsers = userService.selectAllUser(Integer.parseInt(pageIndex), Integer.parseInt(pageSize) , Long.parseLong(currtime));
 			for(int i=0;i<allUsers.size();i++){
 				allUsers.get(i).setPassword("");
 			}

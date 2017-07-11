@@ -50,5 +50,11 @@ public class StringUtils {
 	    Matcher matcher = pattern.matcher((CharSequence) strNum);  
 	    return matcher.matches();  
 	}
+	// 判断是否是13位时间戳数字
+	public static boolean isCurrtime(String currtime){
+		Pattern pattern = Pattern.compile("^\\d{13}$");
+		Matcher matcher = pattern.matcher((CharSequence) currtime);
+		return matcher.matches();
+	}
 
 }

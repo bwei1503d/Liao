@@ -171,9 +171,10 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	}
 
 	@Override
-	public List<User> selectAllUser(int pageIndex, int pageSize) {
+	public List<User> selectAllUser(int pageIndex, int pageSize , long currenttimer) {
 		int firstPage = pageIndex * pageSize;
-		Query query = getSession().createQuery("from User")
+		String sqlString = "from User where lasttime < "+ currenttimer +" order by lasttime desc ";
+		Query query = getSession().createQuery(sqlString)
 				.setFirstResult(firstPage).setMaxResults(pageSize);
 		List<User> list = query.list();
 		return list;
