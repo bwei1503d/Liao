@@ -1,6 +1,5 @@
 package com.ringletter.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.struts2.ServletActionContext;
@@ -57,10 +56,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> selectAllUserAndFriend(User user, int pageIndex,
-			int pageSize) {
+	public List<User> selectAllUserAndFriend(User user, long currenttimer
+			) {
 		List<User> selectAllUser = userDao.selectAllUserAndFriend(user,
-				pageIndex, pageSize);
+				currenttimer);
 		return selectAllUser;
 	}
 
@@ -91,19 +90,20 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String insertChat(Chat chat) {
 		userDao.insertChat(chat);
-		Integer userId = chat.getUserId();
-		User u1 = new User();
-		u1.setUserId(userId);
-		User fromUser = userDao.selectUserById(u1);
-		Integer toUserId = chat.getTouserId();
-		User u2 = new User();
-		u2.setUserId(toUserId);
-		User selectUserById = userDao.selectUserById(u2);
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(selectUserById.getPhone());
-		String sendText = com.ringletter.utils.Util.sendText(
-				fromUser.getPhone(), list, chat.getMessage());
-		return sendText;
+//		Integer userId = chat.getUserId();
+//		User u1 = new User();
+//		u1.setUserId(userId);
+//		User fromUser = userDao.selectUserById(u1);
+//		Integer toUserId = chat.getTouserId();
+//		User u2 = new User();
+//		u2.setUserId(toUserId);
+//		User selectUserById = userDao.selectUserById(u2);
+//		ArrayList<String> list = new ArrayList<String>();
+//		list.add(selectUserById.getPhone());
+//		String sendText = com.ringletter.utils.Util.sendText(
+//				fromUser.getPhone(), list, chat.getMessage());
+//		return sendText;
+		return "" ;
 	}
 
 	@Override
@@ -118,8 +118,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User selectUserById(User user) {
-		User selectUserById = userDao.selectUserById(user);
+	public User selectUserById(User user,String sid) {
+		User selectUserById = userDao.selectUserById(user,sid);
 		return selectUserById;
 	}
 

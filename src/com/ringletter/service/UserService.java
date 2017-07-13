@@ -25,7 +25,7 @@ public interface UserService {
 
 	List<User> selectAllUser(long currenttimer);// 查询出来所有的注册过的用户并且分页
 
-	List<User> selectAllUserAndFriend(User user, int pageIndex, int pageSize);// 查询出来用户的所有好友
+	List<User> selectAllUserAndFriend(User user, long timer);// 查询出来用户的所有好友
 
 	boolean checkAddUser(Relationship relationship);// 验证好友是否存在
 
@@ -33,7 +33,7 @@ public interface UserService {
 
 	String insertChat(Chat chat);// 写入聊天信息
 
-	User selectUserById(User user);// 通过iD查询出需要加的好友的详细信息
+	User selectUserById(User user,String sid);// 通过iD查询出需要加的好友的详细信息 sid 自己的id
 
 	List<Chat> selectChat(Chat chat, int pageIndex, int pageSize);// 查看聊天记录 并分页
 

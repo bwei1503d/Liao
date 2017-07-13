@@ -20,6 +20,7 @@ import com.ringletter.bean.Chat;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 import com.ringletter.dao.UserDao;
+import com.ringletter.utils.StringUtils;
 
 @Repository
 public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
@@ -115,38 +116,56 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	@Override
 	public void addUserrelationship(Relationship relationship) {
 		getHibernateTemplate().save(relationship);
+		
+		Relationship oRelationShip = new Relationship();
+		
 	}
 
-	private List<Relationship> select(User user, int currPage, int pageSize) {
-		int firstResult = currPage * pageSize;
+	private List<Relationship> select(User user, long timer) {
 		Query query = getSession()
-				.createQuery("from Relationship where user_id=? ")
-				.setFirstResult(firstResult).setMaxResults(pageSize)
-				.setInteger(0, user.getUserId());
+				.createQuery("from Relationship where user_id= ' " + user.getUserId() +  " ' and timer <  " + timer + "  order by timer desc ")
+				.setMaxResults(20)
+				;
+		
+		
 		List list = query.list();
 		return list;
 	}
 
 	@Override
-	public List<User> selectAllUserAndFriend(User user, int currPage,
-			int pageSize) {
+	public List<User> selectAllUserAndFriend(User user,long timer) {
 		ArrayList<User> l = new ArrayList<User>();
-		List<Relationship> list = select(user, currPage, pageSize);
+		List<Relationship> list = select(user,timer);
 		for (int i = 0; i < list.size(); i++) {
 			User u = getHibernateTemplate().get(User.class,
-					list.get(i).getUserId());
+					list.get(i).getFriendId());
+			u.setPassword("");
+			u.setYxpassword("");
 			l.add(u);
 		}
 		return l;
 	}
 
 	@Override
-	public User selectUserById(User user) {
+	public User selectUserById(User user,String uid) {
 		User u = getHibernateTemplate().get(User.class, user.getUserId());
 
 		List find = getHibernateTemplate().find("from Album where userId=?",
 				user.getUserId());
 		u.setListAlbum(find);
+		if(!StringUtils.isEmpty(uid)){
+			String hql = "from Relationship where userId = "
+					+ user.getUserId() + " and friendId = "
+					+ uid;
+			List list = getHibernateTemplate().find(hql);
+			if(list.size() > 0){
+				u.setRelation(1);
+			}else{
+				u.setRelation(0);
+			}
+		}else{
+			u.setRelation(0);
+		}
 		return u;
 	}
 
@@ -181,14 +200,41 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
 	@Override
 	public boolean checkAddUser(Relationship relationship) {
-		String hql = "from Relationship where userId = "
-				+ relationship.getUserId() + " and friendId = "
-				+ relationship.getFriendId();
-		List list = getHibernateTemplate().find(hql);
-		if (list != null && list.size() > 0) {
-			return true;
+		// 先判断 该getFriendId 存不存在， 然后在判断好友关系
+		
+		try{
+			String usql = "from User where userId = " + relationship.getFriendId() ; 
+			List ulist =  getHibernateTemplate().find(usql);
+			if(ulist.size() == 0){
+				return false ;
+			}
+			String hql = "from Relationship where userId = "
+					+ relationship.getUserId() + " and friendId = "
+					+ relationship.getFriendId();
+			List list = getHibernateTemplate().find(hql);
+			
+			List<User> userlist = getHibernateTemplate().find(
+					"from User where userId=?",
+					relationship.getFriendId());
+			
+			relationship.setUser(userlist.get(0));
+			if (list != null && list.size() > 0) {
+				return true;
+			}else{
+				Relationship oRelationShip = new Relationship();
+				oRelationShip.setUserId(relationship.getFriendId());
+				oRelationShip.setFriendId(relationship.getUserId());
+				oRelationShip.setTimer(relationship.getTimer());
+				getHibernateTemplate().save(relationship);
+				getHibernateTemplate().save(oRelationShip);
+				return true ;
+				
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			return false ;
 		}
-		return false;
+		
 	}
 
 	@Override

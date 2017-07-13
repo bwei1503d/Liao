@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter.DEFAULT;
 
 import org.apache.struts2.ServletActionContext;
 import org.json.JSONArray;
@@ -43,6 +44,9 @@ import com.ringletter.utils.StringUtils;
 @Scope("prototype")
 public class UserAction extends ActionSupport {
 
+	
+	public static final boolean ISDEBUG  = true ;
+	
 	private static final long serialVersionUID = 1L;
 	private User user;
 	private Album album;
@@ -80,6 +84,9 @@ public class UserAction extends ActionSupport {
 	 */
 	public static int SIGN_ERROR = 304;
 	
+	public static int ADD_FRIEND_ERROR = 305;
+
+	
 	public static String SIGN_ERROR_INFOR = "验签失败" ;
 	/**
 	 * 成功
@@ -101,6 +108,7 @@ public class UserAction extends ActionSupport {
 	}
 
 	// 登录
+//	http://localhost:8080/MyInterface/userAction_login.action?user.sign=1&user.phone=18511085102&user.password=123456&user.secretkey=1111
 	public void login() throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
@@ -115,27 +123,34 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getSign())
 					&& !StringUtils.isEmpty(user.getSecretkey())) {
 				
-				Map<String,String> params = new HashMap<String, String>();
-				params.put("user.phone", user.getPhone());
-				params.put("user.password", user.getPassword());
-				params.put("user.secretkey", user.getSecretkey());
-				if(user.getLat() != 0.0 && user.getLng() != 0.0){
-					params.put("user.lat", user.getLat()+"");
-					params.put("user.lng", user.getLng()+"");
+				if(!ISDEBUG){
+					Map<String,String> params = new HashMap<String, String>();
+					params.put("user.phone", user.getPhone());
+					params.put("user.password", user.getPassword());
+					params.put("user.secretkey", user.getSecretkey());
+					if(user.getLat() != 0.0 && user.getLng() != 0.0){
+						params.put("user.lat", user.getLat()+"");
+						params.put("user.lng", user.getLng()+"");
+					}
+					
+					if(!CipherUtils.vaildSign(params, user.getSign())){
+						jsonObject.put("result_code", ALL_ERROR);
+						jsonObject.put("result_message",
+								URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+						writer.println(jsonObject.toString());
+						return ;
+					}
+					
+					String secretkey = user.getSecretkey() ;
+					String rsaDecode =  SecurityUtils.decrypt(secretkey);
+					String phone = JNCryptorUtils.getInstance().decryptData(user.getPhone(), rsaDecode);
+					user.setPhone(phone);
+					
 				}
 				
-				if(!CipherUtils.vaildSign(params, user.getSign())){
-					jsonObject.put("result_code", ALL_ERROR);
-					jsonObject.put("result_message",
-							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-					writer.println(jsonObject.toString());
-					return ;
-				}
 				
-				String secretkey = user.getSecretkey() ;
-				String rsaDecode =  SecurityUtils.decrypt(secretkey);
-				String phone = JNCryptorUtils.getInstance().decryptData(user.getPhone(), rsaDecode);
-				user.setPhone(phone);
+				
+				
 				
 				// 解密用户的手机号码 手机号码在传输中 隐私数据
 //				JNCryptorUtils.getInstance().decryptData("LcmJxmzKMlmp0GfahT3+jQ==", "837eCi8010n54Pqc");
@@ -209,27 +224,29 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getAge())
 					&& !StringUtils.isEmpty(user.getIntroduce())) {
 				
-				Map<String,String> params = new HashMap<String, String>();
-				params.put("user.phone", user.getPhone());
-				params.put("user.password", user.getPassword());
-				params.put("user.nickname", user.getNickname());
-				params.put("user.gender", user.getGender());
-				params.put("user.age", user.getAge());
-				params.put("user.area", user.getArea());
-				if(user.getLat() != 0.0 && user.getLng() != 0.0){
-					params.put("user.lat", user.getLat()+"");
-					params.put("user.lng", user.getLng()+"");
-				}
-				params.put("user.introduce", user.getIntroduce());
-				
-				
-				if(!CipherUtils.vaildSign(params, user.getSign())){
-					jo.put("result_code", ALL_ERROR);
-					jo.put("result_message",
-							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-					out.println(jo.toString());
+				if(!ISDEBUG){
+					Map<String,String> params = new HashMap<String, String>();
+					params.put("user.phone", user.getPhone());
+					params.put("user.password", user.getPassword());
+					params.put("user.nickname", user.getNickname());
+					params.put("user.gender", user.getGender());
+					params.put("user.age", user.getAge());
+					params.put("user.area", user.getArea());
+					if(user.getLat() != 0.0 && user.getLng() != 0.0){
+						params.put("user.lat", user.getLat()+"");
+						params.put("user.lng", user.getLng()+"");
+					}
+					params.put("user.introduce", user.getIntroduce());
+					
+					
+					if(!CipherUtils.vaildSign(params, user.getSign())){
+						jo.put("result_code", ALL_ERROR);
+						jo.put("result_message",
+								URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+						out.println(jo.toString());
 
-					return ;
+						return ;
+					}
 				}
 				
 
@@ -312,19 +329,23 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getSign())
 					&& user.getPicWidth() != 0 && user.getPicHeight() != 0  ) {
 				
-				Map<String,String> params = new HashMap<String, String>();
-				params.put("user.currenttimer", user.getCurrenttimer());
-				params.put("user.picWidth", user.getPicWidth()+"");
-				params.put("user.picHeight", user.getPicHeight()+"");
-				
-				if(!CipherUtils.vaildSign(params, user.getSign())){
-					jo.put("result_code",SIGN_ERROR);
-					jo.put("result_message",
-							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-					out.println(jo.toString());
+				if(!ISDEBUG){
 
-					return ;
+					Map<String,String> params = new HashMap<String, String>();
+					params.put("user.currenttimer", user.getCurrenttimer());
+					params.put("user.picWidth", user.getPicWidth()+"");
+					params.put("user.picHeight", user.getPicHeight()+"");
+					
+					if(!CipherUtils.vaildSign(params, user.getSign())){
+						jo.put("result_code",SIGN_ERROR);
+						jo.put("result_message",
+								URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+						out.println(jo.toString());
+
+						return ;
+					}
 				}
+				
 				
 				// 删掉原图片
 				try {
@@ -509,78 +530,6 @@ public class UserAction extends ActionSupport {
 		writer.flush();
 	}
 
-//	
-//	// 修改基本信息中的修改头像
-//	public void updateuploadImage() throws Exception {
-//
-//		HttpServletResponse response = ServletActionContext.getResponse();
-//		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
-//		response.setCharacterEncoding("utf-8");
-//		response.setContentType("text/html;charset=UTF-8");
-//		PrintWriter out = response.getWriter();
-//		JSONObject jo = new JSONObject();
-//		User loginUser = (User) ServletActionContext.getContext().getSession()
-//				.get("loginUser");
-//		if (loginUser != null) {
-//
-//			if (user != null && user.getFile().isFile()
-//					&& user.getFile() != null) {
-//
-//				// 删掉原图片
-//				String ouldpath = loginUser.getImagePath();
-//				if (!StringUtils.isEmpty(ouldpath)) {
-//					File f = new File(ouldpath);
-//					f.delete();
-//				}
-//
-//				String realPath = ServletActionContext.getServletContext()
-//						.getRealPath("/images");
-////				System.out.println(realPath);
-////				System.out.println(user.getFileFileName());
-//
-//				String newFileName = UUID.randomUUID().toString()
-//						+ user.getFileFileName().substring(
-//								user.getFileFileName().lastIndexOf("."));
-//
-//				InputStream is = null;
-//				OutputStream os = null;
-//				try {
-//					is = new FileInputStream(user.getFile());
-//					os = new FileOutputStream(realPath + "/" + newFileName);
-//					int i = is.read();
-//					while (i != -1) {
-//						os.write(i);
-//						i = is.read();
-//					}
-//					String filename = IMAGE_HEADER + File.separator
-//							+ "MyInterface" + File.separator + "images"
-//							+ File.separator + newFileName;
-//					loginUser.setImagePath(filename);
-//					userService.uploadHeadPortrait(loginUser);
-//
-//					jo.put("headImagePath", filename);
-//					jo.put("result_code", SUCCESS);
-//					jo.put("result_message", "修改成功");
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//					jo.put("result_code", SERVER_ERROR);
-//					jo.put("result_message", "修改失败");
-//				} finally {
-//					is.close();
-//					os.close();
-//				}
-//			} else {
-//				jo.put("result_code", PRARMS_ERROR);
-//				jo.put("result_message", "参数异常");
-//			}
-//		} else {
-//			jo.put("result_code", UNLOGIN_ERROR);
-//			jo.put("result_message", "用户未登录");
-//		}
-//		out.println(jo.toString());
-//		out.flush();
-//		// out.close();
-//	}
 
 	// 将照片上传到相册中去
 	public void uploadPhotoAlbum() throws Exception {
@@ -600,19 +549,23 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getSign())
 					&& user.getPicWidth() != 0 && user.getPicHeight() != 0 ) {
 				
-				
-				Map<String,String> params = new HashMap<String, String>();
-				params.put("user.currenttimer", user.getCurrenttimer());
-				params.put("user.picWidth", user.getPicWidth()+"");
-				params.put("user.picHeight", user.getPicHeight()+"");
-				
-				if(!CipherUtils.vaildSign(params, user.getSign())){
-					jsonObject.put("result_code", ALL_ERROR);
-					jsonObject.put("result_message",
-							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-					writer.println(jsonObject.toString());
-					return ;
+				if(!ISDEBUG){
+
+					Map<String,String> params = new HashMap<String, String>();
+					params.put("user.currenttimer", user.getCurrenttimer());
+					params.put("user.picWidth", user.getPicWidth()+"");
+					params.put("user.picHeight", user.getPicHeight()+"");
+					
+					if(!CipherUtils.vaildSign(params, user.getSign())){
+						jsonObject.put("result_code", ALL_ERROR);
+						jsonObject.put("result_message",
+								URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+						writer.println(jsonObject.toString());
+						return ;
+					}
+					
 				}
+				
 
 				String realPath = ServletActionContext.getServletContext()
 						.getRealPath("/images");
@@ -690,19 +643,25 @@ public class UserAction extends ActionSupport {
 		Integer pageSum = 0;
 		if (StringUtils.isCurrtime(currtime)&& !StringUtils.isEmpty(sign)) {
 			
-//			Map<String,String> params = new HashMap<String, String>();
-//			params.put("user.currenttimer", currtime);
-//			if(!CipherUtils.vaildSign(params, sign)){
-//				jo.put("result_code", ALL_ERROR);
-//				jo.put("result_message",
-//						URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-//				writer.println(jo.toString());
-//				return ;
-//			}
+			if(!ISDEBUG){
+				
+
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.currenttimer", currtime);
+				if(!CipherUtils.vaildSign(params, sign)){
+					jo.put("result_code", ALL_ERROR);
+					jo.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					writer.println(jo.toString());
+					return ;
+				}
+			}
+			
 			
 			List<User> allUsers = userService.selectAllUser(Long.parseLong(currtime));
 			for(int i=0;i<allUsers.size();i++){
 				allUsers.get(i).setPassword("");
+				allUsers.get(i).setYxpassword("");
 			}
 			pageSum = allUsers.size();
 			Gson g = new Gson();
@@ -721,7 +680,7 @@ public class UserAction extends ActionSupport {
 	}
 
 	// 通过iD查询用户的详情信息
-	// http://localhost:8080/MyoneInterface/userAction_selectUserById.action?user.userId=2
+	// http://localhost:8080/MyInterface/userAction_selectUserById.action?user.userId=2&user.sign=1
 	public void selectUserById() throws Exception {
 		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
 		HttpServletResponse response = ServletActionContext.getResponse();
@@ -739,34 +698,50 @@ public class UserAction extends ActionSupport {
 		if (user!=null && user.getUserId() != null && user.getUserId() != 0
 				&& !StringUtils.isEmpty(user.getSign()) ) {
 			
-			Map<String,String> params = new HashMap<String, String>();
-			params.put("user.userId", user.getUserId()+"");
-			
-			
-			if(!CipherUtils.vaildSign(params, user.getSign())){
-				jsonObject.put("result_code", ALL_ERROR);
-				jsonObject.put("result_message",
-						URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
-				writer.println(jsonObject.toString());
-				return ;
+			if(!ISDEBUG){
+
+				Map<String,String> params = new HashMap<String, String>();
+				params.put("user.userId", user.getUserId()+"");
+				
+				
+				if(!CipherUtils.vaildSign(params, user.getSign())){
+					jsonObject.put("result_code", ALL_ERROR);
+					jsonObject.put("result_message",
+							URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+					writer.println(jsonObject.toString());
+					return ;
+				}
+				
+			}
+			String sid = "" ;
+			if(loginUser != null){
+				sid = loginUser.getUserId() + "" ;
 			}
 			
-			User u = userService.selectUserById(user);
+			User tUser = userService.selectUserById(user,sid);
 
 			jsonObject.put("result_code", SUCCESS);
 			jsonObject.put("result_message", "success");
 
 			long laftTime = System.currentTimeMillis();
-			long createTime = u.getCreatetime();
-			jsonObject2.put("userId", u.getUserId());
-			jsonObject2.put("nickname", u.getNickname());
-			jsonObject2.put("gender", loginUser.getGender());
-			jsonObject2.put("area", loginUser.getArea());
-			jsonObject2.put("introduce", loginUser.getIntroduce());
-			jsonObject2.put("imagePath", loginUser.getImagePath());
+			long createTime = tUser.getCreatetime();
+			jsonObject2.put("userId", tUser.getUserId());
+			jsonObject2.put("nickname", tUser.getNickname());
+			jsonObject2.put("gender", tUser.getGender());
+			jsonObject2.put("area", tUser.getArea());
+			jsonObject2.put("introduce", tUser.getIntroduce());
+			jsonObject2.put("imagePath", tUser.getImagePath());
 			jsonObject2.put("lasttime", laftTime);
 			jsonObject2.put("createtime", createTime);
-			jsonObject2.put("photolist",u.getListAlbum());
+			jsonObject2.put("relation", tUser.getRelation());
+			
+			List<Album> albums =  tUser.getListAlbum() ; 
+			
+			Gson gson = new Gson();
+			
+			 JSONArray jsonArray = new JSONArray(gson.toJson(albums));
+			 
+			jsonObject2.put("photolist",jsonArray);
 			jsonObject.put("data", jsonObject2);
 		} else {
 			jsonObject.put("result_code", PRARMS_ERROR);
@@ -776,51 +751,87 @@ public class UserAction extends ActionSupport {
 	}
 
 	// 添加好友
+//	http://localhost:8080/MyInterface/userAction_addFriends.action?relationship.friendId=10&user.sign=1
 	public void addFriends() {
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter writer = null ;
+		JSONObject jsonObject = new JSONObject();
+
 		try {
-			HttpServletResponse response = ServletActionContext.getResponse();
 			ServletActionContext.getRequest().setCharacterEncoding("utf-8");
 			response.setCharacterEncoding("utf-8");
 			response.setContentType("text/html;charset=UTF-8");
-			PrintWriter writer = response.getWriter();
-			JSONObject jsonObject = new JSONObject();
+			
+			writer = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			
 			// loginUser由登陆成功以后的session中得到
 			User loginUser = (User) ServletActionContext.getContext()
 					.getSession().get("loginUser");
 
 			if (loginUser != null) {
 				if (relationship != null && relationship.getFriendId() != null
-						&& !StringUtils.isEmpty(relationship.getGroupName())
-						&& relationship.getFriendId() != 0) {
+						&& relationship.getFriendId() != 0
+						&& !StringUtils.isEmpty(user.getSign()) ) {
 
+					if(!ISDEBUG){
+						Map<String,String> params = new HashMap<String, String>();
+						params.put("relationship.friendId", relationship.getFriendId()+"");
+						
+						if(!CipherUtils.vaildSign(params, user.getSign())){
+							jsonObject.put("result_code", ALL_ERROR);
+							jsonObject.put("result_message",
+									URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+							writer.println(jsonObject.toString());
+							return ;
+						}
+					}					
+					
 					relationship.setUserId(loginUser.getUserId());
-
+					relationship.setTimer(System.currentTimeMillis());
+					
 					boolean checkAddUser = userService
 							.checkAddUser(relationship);
-					if (checkAddUser == false) {
-						userService.addUserrelationship(relationship);
+					if (checkAddUser) {
+						
 						jsonObject.put("result_code", SUCCESS);
-						jsonObject.put("result_message", "添加好友成功");
+						jsonObject.put("result_message", URLDecoder.decode("添加好友成功", "utf-8"));
+						Gson gson = new Gson();
+						relationship.getUser().setPassword("");
+						relationship.getUser().setYxpassword("");
+						JSONObject jsonUser = new JSONObject(gson.toJson(relationship.getUser()));
+						jsonObject.put("addUser", jsonUser);
+
 					} else {
-						jsonObject.put("result_code", ALL_ERROR);
-						jsonObject.put("result_message", "添加好友失败,添加用户不存在");
+						jsonObject.put("result_code", ADD_FRIEND_ERROR);
+						jsonObject.put("result_message", URLDecoder.decode("添加好友失败,添加用户不存在", "utf-8"));
 					}
-
 				} else {
-
 					jsonObject.put("result_code", PRARMS_ERROR);
-					jsonObject.put("result_message", "参数异常");
-
+					jsonObject.put("result_message", URLDecoder.decode("参数异常", "utf-8"));
 				}
-
 			} else {
 				jsonObject.put("result_code", UNLOGIN_ERROR);
-				jsonObject.put("result_message", "用户未登录");
+				jsonObject.put("result_message", URLDecoder.decode("用户未登录", "utf-8"));
 			}
 			writer.println(jsonObject.toString());
 
 		} catch (Exception e) {
 			e.printStackTrace();
+
+			try {
+				jsonObject.put("result_code", PRARMS_ERROR);
+				jsonObject.put("result_message", URLDecoder.decode("参数异常", "utf-8"));
+				writer.println(jsonObject.toString());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
 		}
 
 	}
@@ -878,6 +889,7 @@ public class UserAction extends ActionSupport {
 
 	// 查询出来用户的所有好友并分页
 	// pageIndex 第几页起， pageSize 每页显示多少条
+//	http://localhost:8080/MyInterface/userAction_selectAllUserAndFriend.action?user.sign=1&user.currenttimer=1499774670000
 	public void selectAllUserAndFriend() throws Exception {
 
 		HttpServletResponse response = ServletActionContext.getResponse();
@@ -886,51 +898,67 @@ public class UserAction extends ActionSupport {
 		response.setContentType("text/html;charset=UTF-8");
 
 		PrintWriter writer = response.getWriter();
-		User loginUser = (User) ServletActionContext.getContext().getSession()
-				.get("loginUser");
-
-		String pageIndex = ServletActionContext.getRequest().getParameter(
-				"pageIndex");
-		String pageSize = ServletActionContext.getRequest().getParameter(
-				"pageSize");
-
 		JSONObject jsonObject = new JSONObject();
-		Gson gson = new Gson();
-		if (loginUser != null) {
 
-			if (!StringUtils.isEmpty(pageIndex)
-					&& !StringUtils.isEmpty(pageSize)) {
+		try{
+			User loginUser = (User) ServletActionContext.getContext().getSession()
+					.get("loginUser");
+			String currenttimer = ServletActionContext.getRequest().getParameter(
+					"user.currenttimer");
+			String sign = ServletActionContext.getRequest().getParameter(
+					"user.sign");
+			long timer = Long.valueOf(currenttimer);
+			
 
-				List<User> selectAllUserAndFriend = userService
-						.selectAllUserAndFriend(loginUser,
-								Integer.parseInt(pageIndex),
-								Integer.parseInt(pageSize));
+			Gson gson = new Gson();
+			if (loginUser != null) {
 
-				if (selectAllUserAndFriend != null
-						&& selectAllUserAndFriend.size() > 0) {
+				if (!StringUtils.isEmpty(currenttimer)
+						&& !StringUtils.isEmpty(sign) 
+						) {				
+					if(!ISDEBUG){
+						Map<String,String> params = new HashMap<String, String>();
+						params.put("user.currenttimer", relationship.getFriendId()+"");										
+						
+						if(!CipherUtils.vaildSign(params, user.getSign())){
+							jsonObject.put("result_code", ALL_ERROR);
+							jsonObject.put("result_message",
+									URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+							writer.println(jsonObject.toString());
+							return ;
+						}
+					}
+					
+					List<User> selectAllUserAndFriend = userService
+							.selectAllUserAndFriend(loginUser,timer
+									);
 
-					String json = gson.toJson(selectAllUserAndFriend);
-					jsonObject.put("result_code", SUCCESS);
-					jsonObject.put("result_message", "success");
-					JSONArray jsonArray = new JSONArray(json);
-					jsonObject.put("data", jsonArray);
+					if (selectAllUserAndFriend != null) {
+						String json = gson.toJson(selectAllUserAndFriend);
+						jsonObject.put("result_code", SUCCESS);
+						jsonObject.put("result_message", "success");
+						JSONArray jsonArray = new JSONArray(json);
+						jsonObject.put("data", jsonArray);
+					} else {
+						jsonObject.put("result_code", ALL_ERROR);
+						jsonObject.put("result_message", "未知错误");
 
+					}
 				} else {
-
-					jsonObject.put("result_code", ALL_ERROR);
-					jsonObject.put("result_message", "没有好友");
-
+					jsonObject.put("result_code", SERVER_ERROR);
+					jsonObject.put("result_message", "参数异常");
 				}
 			} else {
-				jsonObject.put("result_code", SERVER_ERROR);
-				jsonObject.put("result_message", "参数异常");
+				jsonObject.put("result_code", UNLOGIN_ERROR);
+				jsonObject.put("result_message", "用户未登录");
 			}
-
-		} else {
-			jsonObject.put("result_code", UNLOGIN_ERROR);
-			jsonObject.put("result_message", "用户未登录");
+			writer.println(jsonObject.toString());
+		}catch(Exception e){
+			e.printStackTrace();
+			jsonObject.put("result_code", ALL_ERROR);
+			jsonObject.put("result_message", "未知错误");
 		}
-		writer.println(jsonObject.toString());
+		
 	}
 
 	// 查看聊天记录 并分页

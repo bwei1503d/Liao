@@ -15,8 +15,8 @@
 		<property name="friendId" type="java.lang.Integer">
 			<column name="friend_id" />
 		</property>
-		<property name="groupName" type="java.lang.String">
-			<column name="group_name" length="30" />
+		<property name="timer" type="java.lang.Long">
+			<column name="timer" length="13" />
 		</property>
 	</class>
 </hibernate-mapping>

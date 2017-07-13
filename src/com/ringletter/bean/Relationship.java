@@ -1,19 +1,20 @@
 package com.ringletter.bean;
 
-/**
- * @action���ѹ�ϵʵ����
- */
 
 public class Relationship implements java.io.Serializable {
 
 	// Fields
 
 	private Integer relationshipId;
+	//自己
 	private Integer userId;
+	//对方
 	private Integer friendId;
-	private String groupName;
-
+	private long timer ;
 	// Constructors
+	
+	private User user ;
+	
 
 	/** default constructor */
 	public Relationship() {
@@ -26,11 +27,11 @@ public class Relationship implements java.io.Serializable {
 
 	/** full constructor */
 	public Relationship(Integer relationshipId, Integer userId,
-			Integer friendId, String groupName) {
+			Integer friendId, long timer) {
 		this.relationshipId = relationshipId;
 		this.userId = userId;
 		this.friendId = friendId;
-		this.groupName = groupName;
+		this.timer = timer;
 	}
 
 	// Property accessors
@@ -59,12 +60,23 @@ public class Relationship implements java.io.Serializable {
 		this.friendId = friendId;
 	}
 
-	public String getGroupName() {
-		return this.groupName;
+	public long getTimer() {
+		return timer;
 	}
 
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
+	public void setTimer(long timer) {
+		this.timer = timer;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+
+	
 
 }

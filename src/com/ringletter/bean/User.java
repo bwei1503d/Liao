@@ -27,6 +27,9 @@ public class User implements java.io.Serializable {
 	private Long lasttime;
 	private Long createtime;
 	
+	//  0 非好友  1好友
+	private int relation;
+	
 	//
 	private String sign ;
 	//rsa 加密的后key
@@ -43,6 +46,8 @@ public class User implements java.io.Serializable {
 	private File file;
 	//时间蹉  验签
 	private String currenttimer ;
+	
+	private String type ;
 	
 	//图片的宽高
 	private int picWidth;
@@ -307,6 +312,24 @@ public class User implements java.io.Serializable {
 				+ fileContentType + ", listAlbum=" + listAlbum + "]";
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public int getRelation() {
+		return relation;
+	}
+
+	public void setRelation(int relation) {
+		this.relation = relation;
+	}
+
+	
+	
 	
 
 
