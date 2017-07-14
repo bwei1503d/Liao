@@ -45,7 +45,7 @@ import com.ringletter.utils.StringUtils;
 public class UserAction extends ActionSupport {
 
 	
-	public static final boolean ISDEBUG  = true ;
+	public static final boolean ISDEBUG  = false ;
 	
 	private static final long serialVersionUID = 1L;
 	private User user;
@@ -158,7 +158,6 @@ public class UserAction extends ActionSupport {
 				
 
 				User loginUser = userService.login(user);
-
 				if (loginUser != null) {
 
 					ServletActionContext.getContext().getSession()
@@ -178,6 +177,7 @@ public class UserAction extends ActionSupport {
 					jsonObject2.put("lat", loginUser.getLat());
 					jsonObject2.put("lng", loginUser.getLng());
 					jsonObject2.put("lasttime", laftTime);
+					jsonObject2.put("yxpassword", loginUser.getYxpassword());
 					jsonObject2.put("createtime", createTime);
 					jsonObject.put("data", jsonObject2);
 				} else {
@@ -204,6 +204,9 @@ public class UserAction extends ActionSupport {
 	}
 
 	// 注册
+//	http://localhost:8080/MyInterface/userAction_add.action?user.phone=19999999999&user.password=1111&user.nickname=1111&user.gender=1&
+//		user.age=20&user.area=北京&user.introduce=111
+
 	public void add() throws Exception {
 		HttpServletResponse response = ServletActionContext.getResponse();
 		ServletActionContext.getRequest().setCharacterEncoding("utf-8");
@@ -659,10 +662,7 @@ public class UserAction extends ActionSupport {
 			
 			
 			List<User> allUsers = userService.selectAllUser(Long.parseLong(currtime));
-			for(int i=0;i<allUsers.size();i++){
-				allUsers.get(i).setPassword("");
-				allUsers.get(i).setYxpassword("");
-			}
+			
 			pageSum = allUsers.size();
 			Gson g = new Gson();
 			String ujson = g.toJson(allUsers);
@@ -801,8 +801,6 @@ public class UserAction extends ActionSupport {
 						jsonObject.put("result_code", SUCCESS);
 						jsonObject.put("result_message", URLDecoder.decode("添加好友成功", "utf-8"));
 						Gson gson = new Gson();
-						relationship.getUser().setPassword("");
-						relationship.getUser().setYxpassword("");
 						JSONObject jsonUser = new JSONObject(gson.toJson(relationship.getUser()));
 						jsonObject.put("addUser", jsonUser);
 
@@ -918,7 +916,7 @@ public class UserAction extends ActionSupport {
 						) {				
 					if(!ISDEBUG){
 						Map<String,String> params = new HashMap<String, String>();
-						params.put("user.currenttimer", relationship.getFriendId()+"");										
+						params.put("user.currenttimer", user.getCurrenttimer()+"");										
 						
 						if(!CipherUtils.vaildSign(params, user.getSign())){
 							jsonObject.put("result_code", ALL_ERROR);

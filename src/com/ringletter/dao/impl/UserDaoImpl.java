@@ -124,7 +124,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 	private List<Relationship> select(User user, long timer) {
 		Query query = getSession()
 				.createQuery("from Relationship where user_id= ' " + user.getUserId() +  " ' and timer <  " + timer + "  order by timer desc ")
-				.setMaxResults(20)
+				.setMaxResults(10)
 				;
 		
 		
@@ -139,8 +139,6 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		for (int i = 0; i < list.size(); i++) {
 			User u = getHibernateTemplate().get(User.class,
 					list.get(i).getFriendId());
-			u.setPassword("");
-			u.setYxpassword("");
 			l.add(u);
 		}
 		return l;

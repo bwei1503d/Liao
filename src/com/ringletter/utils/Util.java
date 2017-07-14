@@ -18,7 +18,7 @@ public class Util {
 	// 测试方法
 	public static void main(String[] args) {
 		/************* 测试得到token（该接口会限流0） *********/
-		// getToken();
+		 getToken();
 
 		/*********** 测试打印数组类型json（临时用） **********/
 		// User u = new User();
@@ -69,7 +69,7 @@ public class Util {
 			out = new PrintWriter(httpConn.getOutputStream());
 			out.println(Final.TJSON);
 			out.flush();
-
+			
 			// 读取响应
 			if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				StringBuffer content = new StringBuffer();
