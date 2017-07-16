@@ -139,6 +139,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 		for (int i = 0; i < list.size(); i++) {
 			User u = getHibernateTemplate().get(User.class,
 					list.get(i).getFriendId());
+			u.setRelationtime(list.get(i).getTimer());
 			l.add(u);
 		}
 		return l;

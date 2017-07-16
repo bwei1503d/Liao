@@ -26,6 +26,7 @@ public class User implements java.io.Serializable {
 	private String imagePath;
 	private Long lasttime;
 	private Long createtime;
+	private Long relationtime;
 	
 	//  0 非好友  1好友
 	private int relation;
@@ -326,6 +327,14 @@ public class User implements java.io.Serializable {
 
 	public void setRelation(int relation) {
 		this.relation = relation;
+	}
+
+	public Long getRelationtime() {
+		return relationtime;
+	}
+
+	public void setRelationtime(Long relationtime) {
+		this.relationtime = relationtime;
 	}
 
 	
