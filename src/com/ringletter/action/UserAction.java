@@ -242,6 +242,8 @@ public class UserAction extends ActionSupport {
 					params.put("user.introduce", user.getIntroduce());
 					
 					
+					
+					
 					if(!CipherUtils.vaildSign(params, user.getSign())){
 						jo.put("result_code", ALL_ERROR);
 						jo.put("result_message",
