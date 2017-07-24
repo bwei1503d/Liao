@@ -56,5 +56,12 @@ public class StringUtils {
 		Matcher matcher = pattern.matcher((CharSequence) currtime);
 		return matcher.matches();
 	}
+	// 判断是否是男女
+	public static boolean isGender(String gender){
+		if(gender.equals("男") || gender.equals("女")){
+			return true;
+		}
+		return false;
+	}
 
 }

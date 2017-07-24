@@ -121,7 +121,9 @@ public class UserAction extends ActionSupport {
 			if (user != null && !StringUtils.isEmpty(user.getPhone())
 					&& !StringUtils.isEmpty(user.getPassword()) 
 					&& !StringUtils.isEmpty(user.getSign())
-					&& !StringUtils.isEmpty(user.getSecretkey())) {
+					&& !StringUtils.isEmpty(user.getSecretkey())
+					&&  StringUtils.isDigit(user.getPhone())
+					) {
 				
 				if(!ISDEBUG){
 					Map<String,String> params = new HashMap<String, String>();
@@ -225,7 +227,11 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getGender())
 					&& !StringUtils.isEmpty(user.getArea())
 					&& !StringUtils.isEmpty(user.getAge())
-					&& !StringUtils.isEmpty(user.getIntroduce())) {
+					&& !StringUtils.isEmpty(user.getIntroduce())
+					&& StringUtils.isDigit(user.getAge())
+					&& StringUtils.isDigit(user.getPhone())
+					&& StringUtils.isGender(user.getGender())
+					) {
 				
 				if(!ISDEBUG){
 					Map<String,String> params = new HashMap<String, String>();
@@ -435,7 +441,37 @@ public class UserAction extends ActionSupport {
 		if (loginUser != null) {
 
 			String newPassword = request.getParameter("newPassword");
+			
+
+			
 			if (!StringUtils.isEmpty(newPassword)) {
+				
+				
+				
+				
+				
+				
+				if(!ISDEBUG){
+					Map<String,String> params = new HashMap<String, String>();
+					params.put("newPassword", newPassword);
+					
+					if(!CipherUtils.vaildSign(params, user.getSign())){
+						jsonObject.put("result_code", ALL_ERROR);
+						jsonObject.put("result_message",
+								URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+						writer.println(jsonObject.toString());
+
+						return ;
+					}
+				}
+				
+				
+				
+				
+				
+				
+				
+				
 				User user2 = userService.updatePassword(newPassword);
 				if (user2 != null) {
 
