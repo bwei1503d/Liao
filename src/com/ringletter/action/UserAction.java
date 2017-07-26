@@ -122,7 +122,7 @@ public class UserAction extends ActionSupport {
 					&& !StringUtils.isEmpty(user.getPassword()) 
 					&& !StringUtils.isEmpty(user.getSign())
 					&& !StringUtils.isEmpty(user.getSecretkey())
-					&&  StringUtils.isDigit(user.getPhone())
+//					&&  StringUtils.isDigit(user.getPhone())
 					) {
 				
 				if(!ISDEBUG){
