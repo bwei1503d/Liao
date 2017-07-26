@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ringletter.bean.Album;
 import com.ringletter.bean.Chat;
+import com.ringletter.bean.DynamicInfor;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 import com.ringletter.dao.UserDao;
@@ -244,6 +245,26 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 			return find;
 		}
 		return null;
+	}
+	
+	@Override
+	public List<DynamicInfor> selectDynamic(String time) {
+		// TODO Auto-generated method stub
+		
+		try{
+			Query query = getSession()
+					.createQuery("from DynamicInfor where dynamicTime>= ' " + time +  " '  ")
+					.setMaxResults(10)
+					;
+			
+			return query.list();
+		}catch(Exception e){
+			e.printStackTrace();
+			return null ;
+		}
+		
+		
+		
 	}
 
 }

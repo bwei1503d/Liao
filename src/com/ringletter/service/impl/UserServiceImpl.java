@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ringletter.bean.Album;
 import com.ringletter.bean.Chat;
+import com.ringletter.bean.DynamicInfor;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 import com.ringletter.dao.UserDao;
@@ -139,6 +140,12 @@ public class UserServiceImpl implements UserService {
 	public List<Album> selectUserAlbum(Album album) {
 		List<Album> selectUserAlbum = userDao.selectUserAlbum(album);
 		return selectUserAlbum;
+	}
+	
+	@Override
+	public List<DynamicInfor> selectDynamic(String time) {
+		// TODO Auto-generated method stub
+		return userDao.selectDynamic(time);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ringletter.bean.Album;
 import com.ringletter.bean.Chat;
+import com.ringletter.bean.DynamicInfor;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 
@@ -38,4 +39,6 @@ public interface UserService {
 	List<Chat> selectChat(Chat chat, int pageIndex, int pageSize);// 查看聊天记录 并分页
 
 	List<Album> selectUserAlbum(Album album);// 查询用户相册
+	
+	List<DynamicInfor> selectDynamic(String time); //查询动态
 }

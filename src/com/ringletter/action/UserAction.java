@@ -32,6 +32,7 @@ import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
 import com.ringletter.bean.Album;
 import com.ringletter.bean.Chat;
+import com.ringletter.bean.DynamicInfor;
 import com.ringletter.bean.Relationship;
 import com.ringletter.bean.User;
 import com.ringletter.cipher.CipherUtils;
@@ -52,6 +53,7 @@ public class UserAction extends ActionSupport {
 	private Album album;
 	private Chat chat;
 	private Relationship relationship;
+	private DynamicInfor dynamicinfor ;
 	@Autowired
 	private UserService userService;
 
@@ -1095,6 +1097,83 @@ public class UserAction extends ActionSupport {
 		}
 
 	}
+	
+	
+	/**
+	 * 返回朋友圈的信息
+	 */
+	public void selectFriends(){
+		
+		HttpServletResponse response = ServletActionContext.getResponse();
+		PrintWriter writer = null ;
+		JSONObject jsonObject = new JSONObject();
+
+		try {
+			ServletActionContext.getRequest().setCharacterEncoding("utf-8");
+			response.setCharacterEncoding("utf-8");
+			response.setContentType("text/html;charset=UTF-8");
+			
+			writer = response.getWriter();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			
+			// loginUser由登陆成功以后的session中得到
+			User loginUser = (User) ServletActionContext.getContext()
+					.getSession().get("loginUser");
+
+			if (loginUser != null) {
+				if (dynamicinfor != null && dynamicinfor.getDynamicTime() != null
+						&& !StringUtils.isEmpty(user.getSign()) ) {
+
+					if(!ISDEBUG){
+						Map<String,String> params = new HashMap<String, String>();
+						params.put("dynamicinfor.dynamicTime", dynamicinfor.getDynamicTime());
+						
+						if(!CipherUtils.vaildSign(params, user.getSign())){
+							jsonObject.put("result_code", ALL_ERROR);
+							jsonObject.put("result_message",
+									URLDecoder.decode(SIGN_ERROR_INFOR, "utf-8"));
+							writer.println(jsonObject.toString());
+							return ;
+						}
+					}					
+					List<DynamicInfor> list =  userService.selectDynamic(dynamicinfor.getDynamicTime());
+					
+					Gson g = new Gson();
+					String albumJson = g.toJson(list);
+					JSONArray jsonArray = new JSONArray(albumJson);
+					jsonObject.put("result_code", SUCCESS);
+					jsonObject.put("result_message","");
+					jsonObject.put("list", jsonArray);
+				} else {
+					jsonObject.put("result_code", PRARMS_ERROR);
+					jsonObject.put("result_message", URLDecoder.decode("参数异常", "utf-8"));
+				}
+			} else {
+				jsonObject.put("result_code", UNLOGIN_ERROR);
+				jsonObject.put("result_message", URLDecoder.decode("用户未登录", "utf-8"));
+			}
+			writer.println(jsonObject.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			try {
+				jsonObject.put("result_code", PRARMS_ERROR);
+				jsonObject.put("result_message", URLDecoder.decode("参数异常", "utf-8"));
+				writer.println(jsonObject.toString());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+		}
+		
+		
+	}
 
 	public void selectAlbum() throws Exception {
 
@@ -1133,4 +1212,13 @@ public class UserAction extends ActionSupport {
 		this.relationship = relationship;
 	}
 
+	public DynamicInfor getDynamicinfor() {
+		return dynamicinfor;
+	}
+
+	public void setDynamicinfor(DynamicInfor dynamicinfor) {
+		this.dynamicinfor = dynamicinfor;
+	}
+
+	
 }
